@@ -445,3 +445,19 @@ ion-icon{vertical-align:middle}
 .payment-status-notice{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:20px 0;padding:14px 17px;background:#f4f8ed;border:1px solid #dae8c9;border-radius:12px;color:#40552d;font-size:13px;line-height:1.5}
 .payment-status-notice button{border:1px solid #bdd395;border-radius:9px;padding:8px 12px;background:#fff;color:#425f19;font-weight:700;white-space:nowrap;cursor:pointer}
 @media(max-width:640px){.payment-status-notice{flex-direction:column;align-items:start}}
+
+/* Product suggestions inside Kasi AI chat */
+.assistant-thread .assistant-message{display:flex;flex-direction:column;align-self:stretch;align-items:flex-start;min-width:0}
+.assistant-thread .assistant-message.sent{align-items:flex-end}
+.assistant-thread .assistant-message p{max-width:90%}
+.assistant-suggestions{width:100%;display:flex;flex-direction:column;gap:9px;margin-top:9px}
+.assistant-product{display:flex;gap:10px;align-items:center;padding:9px;border:1px solid #e9ece8;border-radius:12px;background:#fff;min-width:0}
+.assistant-product>a{display:block;flex:0 0 57px;height:61px;border-radius:8px;background:#f3f5ed;overflow:hidden}
+.assistant-product>a img{height:100%;width:100%;object-fit:cover}
+.assistant-product-details{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}
+.assistant-product-name{font-size:12px;font-weight:700;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.assistant-product-details strong{font-size:12px;color:#1e2420}
+.assistant-product-details small{font-size:10px;color:#38794e}
+.assistant-product-details small.out-of-stock{color:#b65d41}
+.assistant-add{display:grid;place-items:center;flex:0 0 33px;height:33px;border:0;border-radius:9px;background:var(--lime);color:#20251d;font-size:20px}
+.assistant-add:disabled{background:#eceeed;color:#8a918d}
