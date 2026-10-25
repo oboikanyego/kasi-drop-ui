@@ -214,7 +214,7 @@ export function searchPreview(query=''):Product[]{
  const maxPrice=Number(params.get('maxPrice')||0);
  const sort=params.get('sort')||'featured';
  const expansions:Record<string,string[]>={braai:['biltong','chilli','sauce'],cold:['winter','beanie','hoodie','warm'],warm:['winter','beanie','hoodie'],gift:['gift','handmade','bracelet','mug']};
- const terms=q.split(/s+/).filter(Boolean).flatMap(word=>[word,...(expansions[word]||[])]);
+ const terms=q.split(/\s+/).filter(Boolean).flatMap(word=>[word,...(expansions[word]||[])]);
  const result=previewProducts.filter(p=>p.active&&(category==='All'||p.category===category)&&(!maxPrice||p.price<=maxPrice)&&(!terms.length||terms.some(t=>[p.name,p.description,p.category,...p.tags].join(' ').toLowerCase().includes(t))));
  return result.sort(sort==='price-asc'?(a,b)=>a.price-b.price:sort==='price-desc'?(a,b)=>b.price-a.price:(a,b)=>Number(b.featured)-Number(a.featured));
 }
