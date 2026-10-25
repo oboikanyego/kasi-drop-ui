@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-const code = readFileSync('src/app/app.component.ts', 'utf8');
-const html = readFileSync('src/app/app.component.html', 'utf8');
+import { readSource } from './source.mjs';
+const code = readSource('src/app/app.component.ts');
+const html = readSource('src/app/app.component.html');
 test('chat preserves returned product suggestions on the correct message', () => {
   assert.match(code, /products:result\.products\|\|\[\]/);
   assert.match(code, /products\?:Product\[\]/);
@@ -12,7 +12,7 @@ test('chat preserves returned product suggestions on the correct message', () =>
 test('assistant displays product name, image, price and navigable details', () => {
   assert.match(html, /\[src\]="product\.image"/);
   assert.match(html, /\{\{product\.name\}\}/);
-  assert.match(html, /product\.price \| currency:'ZAR'/);
+  assert.match(html, /product\.price\|currency:'ZAR'/);
   assert.match(html, /\['\/product',product\.id\]/);
   assert.match(html, /onSuggestedImageError\(\$event\)/);
 });

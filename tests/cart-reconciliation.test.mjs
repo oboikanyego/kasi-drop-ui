@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readSource } from './source.mjs';
 
-const cart = readFileSync('src/app/store.service.ts', 'utf8');
-const checkout = readFileSync('src/app/customer.pages.ts', 'utf8');
-const orders = readFileSync('src/app/orders.page.html', 'utf8');
+const cart = readSource('src/app/store.service.ts');
+const checkout = readSource('src/app/customer.pages.ts');
+const orders = readSource('src/app/orders.page.html');
 
 test('payment redirect remembers the pending order before leaving the application', () => {
   assert.match(checkout, /rememberPendingCheckout\(r\.order\.id,items\)/);
@@ -22,7 +22,7 @@ test('cart reconciliation requires matching order id and a verified paid status'
   assert.match(cart, /sessionStorage\.removeItem\('kasi_pending_checkout'\)/);
 });
 test('only purchased quantities are removed, leaving unpurchased items in cart', () => {
-  assert.match(cart, /if\(!purchased\)return \[line\]/);
+  assert.match(cart, /if\(!purchased\)return\[line\]/);
   assert.match(cart, /const left=line\.quantity-purchased\.quantity/);
   assert.match(cart, /left>0\?\[\{\.\.\.line,quantity:left\}\]:\[\]/);
 });
