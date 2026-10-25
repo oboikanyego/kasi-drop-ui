@@ -96,9 +96,10 @@ export class StoreService{
   this.notify(enabled?'Saved to favourites':'Removed from favourites');
   const user=this.user();
   if(!user){localStorage.setItem('kasi_guest_favorites',JSON.stringify(this.favorites()));return;}
-  const revision=this.favoritesRevision;
+  const revision=++this.favoritesRevision;
   // Serialize saves to avoid responses from rapid taps overwriting newer changes.
   this.favoritesQueue=this.favoritesQueue.then(async()=>{
+   if(this.user()?.id!==user.id)return;
    try{
     const result=await firstValueFrom(enabled?this.favoritesApi.addFavorite(id):this.favoritesApi.removeFavorite(id));
     if(this.user()?.id===user.id&&this.favoritesRevision===revision)this.favorites.set(result.productIds);
@@ -115,6 +116,7 @@ export class StoreService{
   const revision=++this.favoritesRevision;
   this.favorites.set([]);
   this.favoritesQueue=this.favoritesQueue.then(async()=>{
+   if(this.user()?.id!==user.id||revision!==this.favoritesRevision)return;
    try{
     const result=await firstValueFrom(this.favoritesApi.getFavorites());
     if(this.user()?.id===user.id&&revision===this.favoritesRevision)this.favorites.set(result.productIds);
@@ -126,6 +128,7 @@ export class StoreService{
   const revision=++this.favoritesRevision;
   this.favorites.set([]);
   this.favoritesQueue=this.favoritesQueue.then(async()=>{
+   if(this.user()?.id!==user.id||revision!==this.favoritesRevision)return;
    try{
     const result=await firstValueFrom(guestIds.length?this.favoritesApi.mergeFavorites(guestIds):this.favoritesApi.getFavorites());
     if(this.user()?.id===user.id&&revision===this.favoritesRevision){
