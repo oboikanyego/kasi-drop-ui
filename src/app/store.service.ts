@@ -31,7 +31,7 @@ export const authInterceptor:HttpInterceptorFn=(req,next)=>{
 export class StoreService{
  readonly cart=signal<CartLine[]>(this.restore<CartLine[]>('kasi_cart',[]));
  readonly user=signal<User|null>(this.restore<User|null>('kasi_user',null));
- readonly favorites=signal<string[]>(this.restore<string[]>('kasi_user',null)?[]:this.restore<string[]>('kasi_guest_favorites',[]));
+ readonly favorites=signal<string[]>(this.user()?[]:this.restore<string[]>('kasi_guest_favorites',[]));
  private readonly favoritesApi=inject(ApiService);
  private favoritesQueue=Promise.resolve();
  private favoritesRevision=0;
