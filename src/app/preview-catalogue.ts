@@ -208,7 +208,7 @@ export const previewProducts:Product[] = [
 ];
 
 export function searchPreview(query=''):Product[]{
- const params=new URLSearchParams(query.replace(/^?/,''));
+ const params=new URLSearchParams(query.startsWith('?')?query.slice(1):query);
  const q=(params.get('q')||'').trim().toLowerCase();
  const category=params.get('category')||'All';
  const maxPrice=Number(params.get('maxPrice')||0);
