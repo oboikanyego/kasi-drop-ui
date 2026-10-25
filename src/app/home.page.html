@@ -44,10 +44,14 @@
     ></a>
   </div>
 
-  <a class="promo-strip" routerLink="/shop" aria-label="Shop and get free delivery over 750 rand">
+  <a
+    class="promo-strip"
+    routerLink="/shop"
+    [attr.aria-label]="'Shop and get free delivery over ' + store.shippingRule().freeFrom + ' rand'"
+  >
     <span class="promo-copy"
-      ><strong>Delivery on us.</strong> Free when you spend <b>R750+</b
-      ><small>Shop local. Save on delivery.</small></span
+      ><strong>Delivery on us.</strong> Free when you spend
+      <b>R{{store.shippingRule().freeFrom}}+</b><small>Shop local. Save on delivery.</small></span
     >
     <span class="promo-art" aria-hidden="true"
       ><ion-icon name="bag-handle-outline"></ion-icon

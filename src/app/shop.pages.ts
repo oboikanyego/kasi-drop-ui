@@ -13,6 +13,7 @@ import { ProductGridComponent } from './product-grid.component';
 })
 export class HomePage implements OnInit {
   readonly api = inject(ApiService);
+  readonly store = inject(StoreService);
   readonly router = inject(Router);
   searchTerm = '';
   featured: Product[] = [];

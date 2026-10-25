@@ -107,8 +107,8 @@
           >
         </div>
         <p *ngIf="store.subtotal()>0&&store.shipping()>0" class="delivery-tip">
-          Add {{750-store.subtotal() | currency:'ZAR':'symbol-narrow':'1.0-0'}} more for free
-          delivery.
+          Add {{store.shippingRule().freeFrom-store.subtotal() |
+          currency:'ZAR':'symbol-narrow':'1.0-0'}} more for free delivery.
         </p>
         <div class="grand-total">
           <span>Total</span
