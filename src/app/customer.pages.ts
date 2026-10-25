@@ -4,7 +4,7 @@ import {FormsModule} from '@angular/forms';
 import {Router,RouterLink} from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { IonIcon } from '@ionic/angular/standalone';
-import {ApiService,StoreService,type SavedAddress} from './store.service';
+import {ApiService,StoreService,type SavedAddress,type Order} from './store.service';
 @Component({standalone:true,imports:[CommonModule,FormsModule,RouterLink,IonIcon],templateUrl:'./cart.page.html'})
 export class CartPage{store=inject(StoreService);api=inject(ApiService);}
 @Component({standalone:true,imports:[CommonModule,FormsModule,RouterLink,IonicModule],templateUrl:'./checkout.page.html',styleUrls:['./profile-page.scss']})
