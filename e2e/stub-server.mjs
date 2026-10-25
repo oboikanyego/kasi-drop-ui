@@ -33,6 +33,33 @@ const address = {
   deliveryNotes: '',
   isDefault: true,
 };
+// Sessions: kasi_session=<base64url JSON user>, httpOnly like the real API's cookie.
+export const encodeSession = (user) => Buffer.from(JSON.stringify(user)).toString('base64url');
+const sessionUser = (req) => {
+  const match = /(?:^|;\s*)kasi_session=([^;]+)/.exec(req.headers.cookie || '');
+  try {
+    return match ? JSON.parse(Buffer.from(match[1], 'base64url').toString()) : null;
+  } catch {
+    return null;
+  }
+};
+const sessionCookie = (user) =>
+  'kasi_session=' + encodeSession(user) + '; Path=/api; HttpOnly; SameSite=Lax';
+const legacyUser = {
+  id: 'u-1',
+  name: 'Thandi Mokoena',
+  email: 'thandi@example.com',
+  role: 'customer',
+};
+// Endpoints any visitor may call; everything else needs the session cookie, like the real API.
+const publicRoutes = [
+  'GET /api/meta',
+  'GET /api/products',
+  'POST /api/auth/login',
+  'POST /api/auth/session',
+  'POST /api/auth/logout',
+  'POST /api/ai/chat',
+];
 let state;
 function reset(options = {}) {
   state = {
@@ -91,8 +118,40 @@ function newOrder(payload, status) {
 async function api(req, res, path) {
   const raw = await readBody(req);
   const body = raw && (req.headers['content-type'] || '').includes('json') ? JSON.parse(raw) : raw;
-  state.requests.push({ method: req.method, path, body, auth: req.headers.authorization || '' });
+  state.requests.push({
+    method: req.method,
+    path,
+    body,
+    auth: req.headers.authorization || '',
+    cookie: req.headers.cookie || '',
+    csrf: req.headers['x-kasidrop-csrf'] || '',
+  });
   const route = req.method + ' ' + path;
+  const user = sessionUser(req);
+  const isPublic = publicRoutes.includes(route) || route.startsWith('GET /api/products/');
+  if (!isPublic && !user) return send(res, 401, { error: 'Sign in required' });
+  if (!isPublic && req.method !== 'GET' && !req.headers['x-kasidrop-csrf'])
+    return send(res, 403, { error: 'Missing CSRF header' });
+  if (route === 'GET /api/auth/me') return send(res, 200, { user });
+  if (route === 'POST /api/auth/login') {
+    if (body.password !== 'Demo@12345')
+      return send(res, 401, { error: 'Invalid email or password' });
+    const signedIn = { ...legacyUser, email: body.email };
+    res.setHeader('set-cookie', sessionCookie(signedIn));
+    // The real API still returns the token for older clients; the UI must not keep it.
+    return send(res, 200, { user: signedIn, token: 'body-token-must-not-be-stored' });
+  }
+  if (route === 'POST /api/auth/session') {
+    if (req.headers.authorization !== 'Bearer legacy-jwt')
+      return send(res, 401, { error: 'Sign in required' });
+    res.setHeader('set-cookie', sessionCookie(legacyUser));
+    return send(res, 200, { user: legacyUser });
+  }
+  if (route === 'POST /api/auth/logout') {
+    res.setHeader('set-cookie', 'kasi_session=; Path=/api; HttpOnly; SameSite=Lax; Max-Age=0');
+    res.writeHead(204);
+    return res.end();
+  }
   if (route === 'GET /api/meta')
     return send(res, 200, {
       categories: ['All'],

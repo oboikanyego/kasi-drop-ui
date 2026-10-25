@@ -13,7 +13,10 @@ test('demo checkout sends the bag and saved address, then clears the purchased i
 
   await expect(page).toHaveURL(/\/orders$/);
   const checkout = (await stub.requests()).find((r) => r.path === '/api/orders/checkout');
-  expect(checkout.auth).toBe('Bearer e2e-token');
+  // Authenticated by the httpOnly cookie plus the CSRF header, never a script-readable token.
+  expect(checkout.auth).toBe('');
+  expect(checkout.cookie).toMatch(/kasi_session=/);
+  expect(checkout.csrf).toBe('1');
   expect(checkout.body).toEqual({
     items: [
       { productId: 'candle', quantity: 2 },

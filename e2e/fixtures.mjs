@@ -1,6 +1,8 @@
 import { test as base, expect } from '@playwright/test';
 import { products } from './stub-server-data.mjs';
 
+const encodeSession = (user) => Buffer.from(JSON.stringify(user)).toString('base64url');
+
 export { expect, products };
 export const customer = {
   id: 'u-1',
@@ -25,22 +27,37 @@ export const test = base.extend({
   },
 });
 
-/** Seed the signed-in user, bag and pending checkout once per tab, before the app boots. */
-export async function seed(page, { user, cart = [], pendingCheckout } = {}) {
+/**
+ * Seed the signed-in user (an httpOnly session cookie, as the API sets it), the bag and the pending
+ * checkout once per tab, before the app boots. `storage` adds raw localStorage entries.
+ */
+export async function seed(
+  page,
+  { user, cart = [], pendingCheckout, session = true, storage = {} } = {},
+) {
+  if (user && session)
+    await page.context().addCookies([
+      {
+        name: 'kasi_session',
+        value: encodeSession(user),
+        domain: 'localhost',
+        path: '/api',
+        httpOnly: true,
+        sameSite: 'Lax',
+      },
+    ]);
   await page.addInitScript(
-    ({ user, cart, pendingCheckout }) => {
+    ({ user, cart, pendingCheckout, storage }) => {
       if (sessionStorage.getItem('__e2e_seeded')) return;
       sessionStorage.setItem('__e2e_seeded', '1');
-      if (user) {
-        localStorage.setItem('kasi_token', 'e2e-token');
-        localStorage.setItem('kasi_user', JSON.stringify(user));
-      }
+      if (user) localStorage.setItem('kasi_user', JSON.stringify(user));
+      for (const [key, value] of Object.entries(storage)) localStorage.setItem(key, value);
       localStorage.setItem('kasi_cart', JSON.stringify(cart));
       localStorage.setItem('kasi_selected', JSON.stringify(cart.map((l) => l.product.id)));
       if (pendingCheckout)
         sessionStorage.setItem('kasi_pending_checkout', JSON.stringify(pendingCheckout));
     },
-    { user, cart, pendingCheckout },
+    { user, cart, pendingCheckout, storage },
   );
 }
 export const storedCart = (page) =>

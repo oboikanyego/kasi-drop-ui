@@ -7,9 +7,11 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   { files: ['src/**/*.ts'], languageOptions: { globals: globals.browser } },
+  { files: ['tests/**/*.mjs', '*.mjs'], languageOptions: { globals: globals.node } },
+  // Browser tests run in Node, but page.evaluate callbacks run in the page.
   {
-    files: ['tests/**/*.mjs', 'e2e/**/*.mjs', '*.mjs'],
-    languageOptions: { globals: globals.node },
+    files: ['e2e/**/*.mjs'],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
   {
     rules: {

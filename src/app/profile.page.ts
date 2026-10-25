@@ -110,7 +110,7 @@ export class AccountPage implements OnInit, OnDestroy {
       : this.api.login({ email: this.email, password: this.password });
     request.subscribe({
       next: (result) => {
-        this.store.login(result.token, result.user);
+        this.store.login(result.user);
         this.password = '';
         this.busy = false;
         this.loadProfile();
