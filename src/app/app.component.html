@@ -3,8 +3,7 @@
   <header class="desktop-header">
    <div class="shell desktop-header-inner">
     <a routerLink="/" class="identity" aria-label="KasiDrop home">
-     <span class="identity-icon"><ion-icon name="sparkles-outline"></ion-icon></span>
-     <span class="identity-name">kasi<span>drop</span><small>MADE HERE. LOVED EVERYWHERE.</small></span>
+     <img class="identity-brand-image" src="assets/brand/kasidrop-wordmark.webp" alt="KasiDrop — Made here. Loved everywhere." width="420" height="120" decoding="async" fetchpriority="high">
     </a>
     <nav class="desktop-links" aria-label="Primary navigation">
      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Home</a>
@@ -28,7 +27,7 @@
 
   <footer class="desktop-footer">
    <div class="shell footer-inner">
-    <div><strong>kasidrop<span>.</span></strong><p>Local roots. Delivered. Discover South African makers, flavours and fresh everyday finds.</p></div>
+    <div><a routerLink="/" aria-label="KasiDrop home"><img class="footer-brand-image" src="assets/brand/kasidrop-wordmark.webp" alt="KasiDrop" width="420" height="120" loading="lazy" decoding="async"></a><p>Local roots. Delivered. Discover South African makers, flavours and fresh everyday finds.</p></div>
     <nav aria-label="Footer links"><a routerLink="/shop">Shop</a><a routerLink="/favorites">Saved items</a><a routerLink="/orders">Your orders</a><a routerLink="/account">Account</a></nav>
     <small>© KasiDrop 2026 · Prices in ZAR · Demo checkout</small>
    </div>
