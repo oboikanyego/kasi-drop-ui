@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-const store = readFileSync('src/app/store.service.ts', 'utf8');
+import { readSource } from './source.mjs';
+const store = readSource('src/app/store.service.ts');
 test('signed-in favourites are loaded from backend, guest storage is distinct', () => {
   assert.match(store, /getFavorites\(\)\{/);
   assert.match(store, /private loadAccountFavorites\(\)/);

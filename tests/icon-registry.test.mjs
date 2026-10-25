@@ -6,7 +6,7 @@ import { resolve } from 'node:path';
 const appRoot = resolve('src/app');
 const registry = readFileSync(resolve(appRoot, 'icons.ts'), 'utf8');
 const registered = new Set(
-  Array.from(registry.matchAll(/^\s*'([a-z0-9-]+)':/gm), (match) => match[1]),
+  Array.from(registry.matchAll(/^\s*'?([a-z0-9-]+)'?:\s*\w+,?$/gm), (match) => match[1]),
 );
 const names = new Set();
 for (const filename of readdirSync(appRoot).filter((file) => file.endsWith('.html'))) {

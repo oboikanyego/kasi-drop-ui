@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-const html = readFileSync('src/app/app.component.html', 'utf8');
-const css = readFileSync('src/styles.scss', 'utf8');
+import { readSource, readStyles } from './source.mjs';
+const html = readSource('src/app/app.component.html');
+const css = readStyles('src/styles.scss');
 test('chat uses sender labels and bubble markup', () => {
   assert.match(html, /message\.from==='user'\?'You':'Kasi AI'/);
   assert.match(html, /class="assistant-message-label"/);
