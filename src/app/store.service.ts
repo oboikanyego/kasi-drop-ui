@@ -5,7 +5,7 @@ import {previewProducts,searchPreview} from './preview-catalogue';
 export type Product={id:string;name:string;description:string;category:string;price:number;stock:number;image:string;tags:string[];featured:boolean;active:boolean};
 export type CartLine={product:Product;quantity:number};
 export type User={id:string;name:string;email:string;role:'customer'|'admin'};
-export type Order={id:string;items:{productId:string;name:string;price:number;quantity:number;image:string}[];total:number;subtotal:number;shipping:number;status:string;createdAt:string;delivery:{name:string;address:string;city:string}};
+export type Order={id:string;items:{productId:string;name:string;price:number;quantity:number;image:string}[];total:number;subtotal:number;shipping:number;status:string;createdAt:string;demoSeed?:boolean;delivery:{name:string;address:string;city:string}};
 export const authInterceptor:HttpInterceptorFn=(req,next)=>{
  const token=typeof localStorage==='undefined'?'':localStorage.getItem('kasi_token');
  return next(token?req.clone({setHeaders:{Authorization:'Bearer '+token}}):req);
@@ -86,7 +86,7 @@ export class ApiService{
  register(body:{name:string;email:string;password:string}){return this.http.post<{user:User;token:string}>(this.base+'/auth/register',body);}
  checkout(payload:unknown){return this.http.post<{order:Order;payment:null|{url:string;fields:Record<string,string>};warning?:string}>(this.base+'/orders/checkout',payload);}
  orders(){return this.http.get<{orders:Order[]}>(this.base+'/orders');}
- adminSummary(){return this.http.get<{products:number;lowStock:number;orders:number;revenue:number;recentOrders:Order[]}>(this.base+'/admin/summary');}
+ adminSummary(){return this.http.get<{products:number;lowStock:number;orders:number;demoOrders:number;revenue:number;simulatedRevenue:number;recentOrders:Order[]}>(this.base+'/admin/summary');}
  adminOrders(){return this.http.get<{orders:Order[]}>(this.base+'/admin/orders');}
  setOrderStatus(id:string,status:string){return this.http.patch(this.base+'/admin/orders/'+encodeURIComponent(id),{status});}
  createProduct(product:Partial<Product>){return this.http.post<{product:Product}>(this.base+'/admin/products',product);}

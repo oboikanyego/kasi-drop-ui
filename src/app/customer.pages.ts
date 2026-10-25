@@ -8,8 +8,13 @@ import {ApiService,StoreService,Order} from './store.service';
 @Component({standalone:true,imports:[CommonModule,FormsModule,RouterLink,IonIcon],templateUrl:'./cart.page.html'})
 export class CartPage{store=inject(StoreService);api=inject(ApiService);}
 @Component({standalone:true,imports:[CommonModule,FormsModule,RouterLink,IonicModule],templateUrl:'./account.page.html'})
-export class AccountPage{
+export class AccountPage implements OnInit {
  store=inject(StoreService);api=inject(ApiService);router=inject(Router);
+ demoLoginAvailable=false;
+ ngOnInit(){this.api.meta().subscribe({
+  next:meta=>{this.demoLoginAvailable=meta.demoMode;},
+  error:()=>{this.demoLoginAvailable=false;}
+ });}
  registerMode=false;busy=false;error='';name='';email='';password='';
  submit(){
   if(this.busy)return;this.busy=true;this.error='';
@@ -18,7 +23,7 @@ export class AccountPage{
    error:e=>{this.error=e.error?.error||'Could not sign in. Please check your details.';this.busy=false;}});
  }
  logout(){this.store.logout();this.store.notify('Signed out');}
- fillDemo(role:'admin'|'shopper'){this.email=role==='admin'?'admin@kasidrop.test':'shopper@kasidrop.test';this.password='Demo@12345';this.registerMode=false;}
+ fillDemo(role:'admin'|'shopper'){if(!this.demoLoginAvailable)return;this.email=role==='admin'?'admin@kasidrop.test':'shopper@kasidrop.test';this.password='Demo@12345';this.registerMode=false;}
 }
 @Component({standalone:true,imports:[CommonModule,FormsModule,RouterLink,IonicModule],templateUrl:'./checkout.page.html'})
 export class CheckoutPage implements OnInit{
