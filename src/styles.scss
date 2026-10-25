@@ -411,9 +411,7 @@ ion-icon{vertical-align:middle}
 .identity-brand-image{display:block;width:186px;max-width:100%;height:auto;object-fit:contain}
 .identity{min-width:0}
 .footer-brand-image{display:block;width:175px;max-width:100%;height:auto;object-fit:contain;margin-bottom:10px}
-.round-logo{background:transparent!important;border-radius:13px!important;overflow:hidden;padding:0!important}
-/* Blend the icon's baked-in white backdrop into the surrounding surface. */
-.kasi-wordmark-fallback img,.mobile-brand-image,.round-logo img{background:transparent!important;mix-blend-mode:multiply}
+.round-logo{background:#fff!important;border-radius:13px!important;overflow:hidden;padding:0!important}
 .mobile-brand-image{display:block;width:100%;height:100%;object-fit:cover;border-radius:12px}
 @media(min-width:701px) and (max-width:1050px){
  .identity-brand-image{width:154px}
