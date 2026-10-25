@@ -2,6 +2,7 @@ import {Injectable,computed,signal,inject} from '@angular/core';
 import {HttpClient,HttpInterceptorFn} from '@angular/common/http';
 import {catchError,of,tap,throwError,timeout} from 'rxjs';
 import {previewProducts,searchPreview} from './preview-catalogue';
+import {isApiUnavailable} from './api-availability';
 export type Product={id:string;name:string;description:string;category:string;price:number;stock:number;image:string;tags:string[];featured:boolean;active:boolean};
 export type CartLine={product:Product;quantity:number};
 export type PurchasedLine={productId:string;quantity:number};
@@ -105,15 +106,12 @@ export class ApiService{
  private readonly base='/api';
  /** A failed API request switches catalogue browsing into explicitly marked read-only preview mode. */
  readonly previewMode=signal(false);
- private isUnavailable(error:any):boolean{
-  return error?.name==='TimeoutError'||[0,502,503,504,404].includes(error?.status);
- }
  getProducts(query=''){
   return this.http.get<{products:Product[];total:number}>(this.base+'/products'+query).pipe(
    timeout(12000),
    tap(()=>this.previewMode.set(false)),
    catchError(err=>{
-    if(!this.isUnavailable(err))return throwError(()=>err);
+    if(!isApiUnavailable(err))return throwError(()=>err);
     this.previewMode.set(true);
     const products=searchPreview(query);
     return of({products,total:products.length});
@@ -125,7 +123,7 @@ export class ApiService{
    timeout(12000),
    tap(()=>this.previewMode.set(false)),
    catchError(err=>{
-    if(!this.isUnavailable(err))return throwError(()=>err);
+    if(!isApiUnavailable(err))return throwError(()=>err);
     const product=previewProducts.find(p=>p.id===id);
     if(!product)return throwError(()=>err);
     this.previewMode.set(true);
