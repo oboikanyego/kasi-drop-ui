@@ -5,13 +5,13 @@ import { resolve } from 'node:path';
 
 const appRoot = resolve('src/app');
 const registry = readFileSync(resolve(appRoot,'icons.ts'),'utf8');
-const registered = new Set(Array.from(registry.matchAll(/^\\s*'([a-z0-9-]+)':/gm),match=>match[1]));
+const registered = new Set(Array.from(registry.matchAll(/^\s*'([a-z0-9-]+)':/gm),match=>match[1]));
 const names = new Set();
 for (const filename of readdirSync(appRoot).filter(file=>file.endsWith('.html'))) {
   const html=readFileSync(resolve(appRoot,filename),'utf8');
-  for (const match of html.matchAll(/<ion-icon\\b[^>]*\\bname="([a-z0-9-]+)"/g)) names.add(match[1]);
+  for (const match of html.matchAll(/<ion-icon\b[^>]*\bname="([a-z0-9-]+)"/g)) names.add(match[1]);
   // Dynamically bound name values, e.g. condition ? 'heart' : 'heart-outline'.
-  for (const match of html.matchAll(/<ion-icon\\b[^>]*\\[name\\]="([^"]+)"/g)) {
+  for (const match of html.matchAll(/<ion-icon\b[^>]*\[name\]="([^"]+)"/g)) {
     for (const value of match[1].matchAll(/'([a-z0-9-]+)'/g)) names.add(value[1]);
   }
 }
