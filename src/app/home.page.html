@@ -1,0 +1,44 @@
+<div class="home-page shell">
+ <div class="mobile-home-top">
+  <a class="round-logo" routerLink="/" aria-label="KasiDrop home"><ion-icon name="sparkles-outline"></ion-icon></a>
+  <div class="delivery-label"><small>Delivering across</small><strong><ion-icon name="location-outline"></ion-icon> South Africa</strong></div>
+  <a class="circle-action" routerLink="/orders" aria-label="Your orders"><ion-icon name="notifications-outline"></ion-icon></a>
+ </div>
+ <div class="mobile-search">
+  <form class="search-field" (ngSubmit)="searchNow()">
+   <ion-icon name="search-outline"></ion-icon>
+   <input name="search" [(ngModel)]="searchTerm" placeholder="Search the entire shop" aria-label="Search products">
+  </form>
+ </div>
+
+ <div class="home-desktop-intro"><div><span class="kicker">DISCOVER MADE-IN-MZANSI GOODNESS</span><h1>Find your next <span>local favourite.</span></h1><p>Good stuff from right here in South Africa, made for everyday life.</p></div><a routerLink="/shop" class="outlined-button">Browse all products <ion-icon name="arrow-forward-outline"></ion-icon></a></div>
+
+ <a class="promo-strip" routerLink="/shop" aria-label="Shop and get free delivery over 750 rand">
+  <span class="promo-copy"><strong>Delivery on us.</strong> Free when you spend <b>R750+</b><small>Shop local. Save on delivery.</small></span>
+  <span class="promo-art" aria-hidden="true"><ion-icon name="bag-handle-outline"></ion-icon></span>
+ </a>
+
+ <section class="categories-section" aria-labelledby="category-heading">
+  <div class="section-title-row"><h2 id="category-heading">Categories</h2><a routerLink="/shop">See all <span class="tiny-arrow"><ion-icon name="chevron-forward-outline"></ion-icon></span></a></div>
+  <div class="category-scroller">
+   <a routerLink="/shop" [queryParams]="{category:'Food & Drink'}" class="category-tile"><span class="category-circle"><ion-icon name="cafe-outline"></ion-icon></span><span>Food & Drink</span></a>
+   <a routerLink="/shop" [queryParams]="{category:'Fashion'}" class="category-tile"><span class="category-circle"><ion-icon name="shirt-outline"></ion-icon></span><span>Fashion</span></a>
+   <a routerLink="/shop" [queryParams]="{category:'Home & Living'}" class="category-tile"><span class="category-circle"><ion-icon name="home-outline"></ion-icon></span><span>Home</span></a>
+   <a routerLink="/shop" [queryParams]="{category:'Crafts'}" class="category-tile"><span class="category-circle"><ion-icon name="color-palette-outline"></ion-icon></span><span>Crafts</span></a>
+   <a routerLink="/shop" class="category-tile"><span class="category-circle"><ion-icon name="gift-outline"></ion-icon></span><span>All local</span></a>
+  </div>
+ </section>
+
+ <section class="featured-section" aria-labelledby="featured-heading">
+  <div class="section-title-row">
+   <div class="heading-with-label"><h2 id="featured-heading">Local picks</h2><span class="lime-stamp">THE KASI EDIT</span></div>
+   <a routerLink="/shop">See all <span class="tiny-arrow"><ion-icon name="chevron-forward-outline"></ion-icon></span></a>
+  </div>
+  <p class="section-description">Good finds from South African makers and creators.</p>
+  <app-product-grid *ngIf="featured.length" [products]="featured"></app-product-grid>
+  <div class="skeleton-grid" *ngIf="loading"><div *ngFor="let n of [1,2,3,4]" class="skeleton-card"></div></div>
+  <div class="notice-error" *ngIf="error">{{error}} <button type="button" (click)="reload()">Retry</button></div>
+ </section>
+
+ <section class="local-note"><div class="local-note-copy"><span>MADE HERE. LOVED EVERYWHERE.</span><h2>Something good, from somewhere close.</h2><p>Thoughtful gifts, local flavours and everyday favourites. All in one place.</p><a routerLink="/shop" class="dark-pill">Explore the catalogue <ion-icon name="arrow-forward-outline"></ion-icon></a></div><div class="local-note-symbol" aria-hidden="true">K<span>✳</span></div></section>
+</div>
