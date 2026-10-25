@@ -3,6 +3,12 @@ import { HttpClient, HttpInterceptorFn } from '@angular/common/http';
 import { catchError, firstValueFrom, of, tap, throwError, timeout } from 'rxjs';
 import { previewProducts, searchPreview } from './preview-catalogue';
 import { isApiUnavailable } from './api-availability';
+import {
+  defaultShippingRule,
+  parseShippingRule,
+  shippingFor,
+  type ShippingRule,
+} from './shipping-rule';
 export type Product = {
   id: string;
   name: string;
@@ -100,9 +106,15 @@ export class StoreService {
   readonly subtotal = computed(() =>
     this.selectedCart().reduce((n, x) => n + x.product.price * x.quantity, 0),
   );
-  readonly shipping = computed(() => (this.subtotal() >= 750 || this.subtotal() === 0 ? 0 : 79));
+  /** Delivery rule published by the API (GET /api/meta), so the bag shows what checkout charges. */
+  readonly shippingRule = signal<ShippingRule>(defaultShippingRule);
+  readonly shipping = computed(() => shippingFor(this.subtotal(), this.shippingRule()));
   readonly total = computed(() => this.subtotal() + this.shipping());
   toast = signal('');
+  useShippingRule(value: unknown) {
+    const rule = parseShippingRule(value);
+    if (rule) this.shippingRule.set(rule);
+  }
   private restore<T>(key: string, initial: T): T {
     try {
       return JSON.parse(localStorage.getItem(key) || 'null') ?? initial;
@@ -433,6 +445,7 @@ export class ApiService {
       demoMode: boolean;
       aiEnabled: boolean;
       checkoutEnabled: boolean;
+      shipping?: ShippingRule;
     }>(this.base + '/meta');
   }
   login(body: { email: string; password: string }) {

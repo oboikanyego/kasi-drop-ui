@@ -30,6 +30,10 @@ export class AppComponent {
   chatOpen = signal(false);
   chatText = '';
   thinking = signal(false);
+  constructor() {
+    // Older API deployments omit the rule; the store then keeps its default.
+    this.api.meta().subscribe({ next: (meta) => this.store.useShippingRule(meta.shipping) });
+  }
   chatMessages = signal<{ from: 'bot' | 'user'; text: string; products?: Product[] }[]>([
     {
       from: 'bot',
