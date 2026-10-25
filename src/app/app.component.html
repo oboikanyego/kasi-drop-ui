@@ -1,0 +1,34 @@
+<ion-app>
+ <ion-content [fullscreen]="true">
+  <div class="announcement">🇿🇦 PROUDLY LOCAL • FREE DELIVERY ON ORDERS OVER R750</div>
+  <header class="site-header">
+   <div class="header-inner">
+    <a class="brand" routerLink="/" aria-label="KasiDrop home"><span class="brand-mark">K<span>.</span></span><span>Kasi<span>Drop</span><small>LOCAL ROOTS. DELIVERED.</small></span></a>
+    <nav class="desktop-nav" aria-label="Main navigation"><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Home</a><a routerLink="/shop" routerLinkActive="active">Shop all</a><a routerLink="/shop" [queryParams]="{category:'Food & Drink'}">Food & drink</a><a routerLink="/shop" [queryParams]="{category:'Fashion'}">Fashion</a><a routerLink="/shop" [queryParams]="{category:'Crafts'}">Crafts</a></nav>
+    <div class="header-actions">
+     <form class="header-search" (ngSubmit)="searchNow()"><input [(ngModel)]="search" name="q" placeholder="What are you looking for?" aria-label="Search products"><button type="submit" aria-label="Search">⌕</button></form>
+     <a class="head-link user-shortcut" routerLink="/account" [attr.aria-label]="store.user()?'My account':'Sign in'">◯</a>
+     <a class="head-link cart-shortcut" routerLink="/cart" aria-label="Shopping bag">♧<span *ngIf="store.count()">{{store.count()}}</span></a>
+    </div>
+   </div>
+  </header>
+  <main><router-outlet></router-outlet></main>
+  <footer class="site-footer">
+   <div class="container footer-grid">
+    <div><a class="brand footer-brand" routerLink="/"><span class="brand-mark">K<span>.</span></span><span>Kasi<span>Drop</span></span></a><p>Made here. Loved everywhere.<br>Celebrating the best of South African creativity, culture and craft.</p></div>
+    <div><h4>Explore</h4><a routerLink="/shop">Shop all</a><a routerLink="/shop" [queryParams]="{category:'Fashion'}">Fashion</a><a routerLink="/shop" [queryParams]="{category:'Food & Drink'}">Food & Drink</a></div>
+    <div><h4>Need help?</h4><a routerLink="/account">My account</a><a routerLink="/orders">Track an order</a><a routerLink="/cart">Shopping bag</a></div>
+    <div><h4>Built for Mzansi</h4><p>Shopping in rands, backed by secure checkout. Our demo uses simulated payments only.</p><span class="flag">🇿🇦 Proudly South African</span></div>
+   </div>
+   <div class="container footer-bottom"><span>© 2026 KasiDrop. Made with love in Mzansi.</span><span>Payments in ZAR · Demo storefront</span></div>
+  </footer>
+  <nav class="mobile-nav" aria-label="Mobile navigation"><a routerLink="/">⌂<small>Home</small></a><a routerLink="/shop">▦<small>Shop</small></a><a routerLink="/cart">♧<small>Bag ({{store.count()}})</small></a><a routerLink="/account">◯<small>Account</small></a></nav>
+  <div class="toast-alert" *ngIf="store.toast()">{{store.toast()}}</div>
+  <button class="assistant-toggle" aria-label="Chat with shopping assistant" (click)="chatOpen.set(!chatOpen())">{{chatOpen()?'×':'✦'}} <span *ngIf="!chatOpen()">Ask Kasi AI</span></button>
+  <section class="assistant" *ngIf="chatOpen()" aria-label="KasiDrop assistant">
+   <div class="assistant-head"><div><strong>✦ Kasi AI</strong><small>Your personal local shopping helper</small></div><button (click)="chatOpen.set(false)" aria-label="Close assistant">×</button></div>
+   <div class="assistant-messages"><p *ngFor="let m of chatMessages()" [class.mine]="m.from==='user'">{{m.text}}</p><p *ngIf="thinking()">Finding something lekker…</p></div>
+   <form (ngSubmit)="sendChat()"><input [(ngModel)]="chatText" name="message" placeholder="Gift under R500 for a braai fan…" maxlength="400" aria-label="Ask shopping assistant"><button type="submit" [disabled]="thinking()">➤</button></form>
+  </section>
+ </ion-content>
+</ion-app>

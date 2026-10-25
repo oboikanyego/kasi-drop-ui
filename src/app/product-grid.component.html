@@ -1,0 +1,14 @@
+<div class="product-grid">
+ <article class="product-card" *ngFor="let product of products">
+  <a class="product-picture" [routerLink]="['/product',product.id]">
+   <img [src]="product.image" [alt]="product.name" loading="lazy" (error)="imageError($event)">
+   <span class="product-tag" *ngIf="product.featured">LOCAL FAVOURITE</span>
+  </a>
+  <div class="product-info">
+   <span class="product-category">{{product.category}}</span>
+   <a [routerLink]="['/product',product.id]"><h3>{{product.name}}</h3></a>
+   <div class="product-foot"><strong>{{product.price | currency:'ZAR':'symbol-narrow':'1.0-0'}}</strong><button class="add-mini" type="button" (click)="store.add(product)" [disabled]="!product.stock" [attr.aria-label]="'Add '+product.name+' to bag'">+</button></div>
+   <small *ngIf="product.stock<=5" class="low-stock">{{product.stock ? 'Only '+product.stock+' left' : 'Out of stock'}}</small>
+  </div>
+ </article>
+</div>
