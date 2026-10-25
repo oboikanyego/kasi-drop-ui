@@ -1,19 +1,75 @@
 <div class="catalogue-page shell">
- <div class="mobile-page-title"><a class="circle-action" routerLink="/" aria-label="Go home"><ion-icon name="chevron-back-outline"></ion-icon></a><h1>Catalog</h1><a routerLink="/cart" class="circle-action with-count" aria-label="Cart"><ion-icon name="bag-handle-outline"></ion-icon></a></div>
- <div class="catalogue-heading"><span class="kicker">MADE LOCAL, SHOP LOCAL</span><h1>Discover something <span>lekker.</span></h1><p>Browse KasiDrop's curated collection.</p></div>
- <form class="catalogue-search search-field" (ngSubmit)="load()"><ion-icon name="search-outline"></ion-icon><input name="query" [(ngModel)]="q" placeholder="What are you looking for?" aria-label="Search the catalog"><button type="submit">Search</button></form>
- <div class="catalogue-categories" role="group" aria-label="Product categories">
-  <button type="button" *ngFor="let c of categories" (click)="setCategory(c)" [class.chosen]="category===c">{{c}}</button>
- </div>
- <div class="catalogue-tools">
-  <div><h2>{{category==='All'?'All products':category}}</h2><p>{{products.length}} products</p></div>
-  <div class="catalogue-selects">
-   <label><span>Budget</span><select [(ngModel)]="maxPrice" (change)="load()" aria-label="Maximum price"><option [ngValue]="0">Any price</option><option [ngValue]="150">Under R150</option><option [ngValue]="300">Under R300</option><option [ngValue]="500">Under R500</option></select></label>
-   <label><span>Sort</span><select [(ngModel)]="sort" (change)="load()" aria-label="Sort products"><option value="featured">Featured</option><option value="price-asc">Low to high</option><option value="price-desc">High to low</option></select></label>
+  <div class="mobile-page-title">
+    <a class="circle-action" routerLink="/" aria-label="Go home"
+      ><ion-icon name="chevron-back-outline"></ion-icon
+    ></a>
+    <h1>Catalog</h1>
+    <a routerLink="/cart" class="circle-action with-count" aria-label="Cart"
+      ><ion-icon name="bag-handle-outline"></ion-icon
+    ></a>
   </div>
- </div>
- <div class="skeleton-grid" *ngIf="loading"><div *ngFor="let n of [1,2,3,4]" class="skeleton-card"></div></div>
- <app-product-grid *ngIf="!loading&&products.length" [products]="products"></app-product-grid>
- <div class="empty-panel" *ngIf="!loading&&!products.length&&!error"><ion-icon name="search-outline"></ion-icon><h3>No products found</h3><p>Try a different search or category.</p><button type="button" class="lime-button" (click)="q='';setCategory('All')">Clear filters</button></div>
- <div class="notice-error" *ngIf="error">{{error}} <button (click)="load()">Try again</button></div>
+  <div class="catalogue-heading">
+    <span class="kicker">MADE LOCAL, SHOP LOCAL</span>
+    <h1>Discover something <span>lekker.</span></h1>
+    <p>Browse KasiDrop's curated collection.</p>
+  </div>
+  <form class="catalogue-search search-field" (ngSubmit)="load()">
+    <ion-icon name="search-outline"></ion-icon
+    ><input
+      name="query"
+      [(ngModel)]="q"
+      placeholder="What are you looking for?"
+      aria-label="Search the catalog"
+    /><button type="submit">Search</button>
+  </form>
+  <div class="catalogue-categories" role="group" aria-label="Product categories">
+    <button
+      type="button"
+      *ngFor="let c of categories"
+      (click)="setCategory(c)"
+      [class.chosen]="category===c"
+    >
+      {{c}}
+    </button>
+  </div>
+  <div class="catalogue-tools">
+    <div>
+      <h2>{{category==='All'?'All products':category}}</h2>
+      <p>{{products.length}} products</p>
+    </div>
+    <div class="catalogue-selects">
+      <label
+        ><span>Budget</span
+        ><select [(ngModel)]="maxPrice" (change)="load()" aria-label="Maximum price">
+          <option [ngValue]="0">Any price</option>
+          <option [ngValue]="150">Under R150</option>
+          <option [ngValue]="300">Under R300</option>
+          <option [ngValue]="500">Under R500</option>
+        </select></label
+      >
+      <label
+        ><span>Sort</span
+        ><select [(ngModel)]="sort" (change)="load()" aria-label="Sort products">
+          <option value="featured">Featured</option>
+          <option value="price-asc">Low to high</option>
+          <option value="price-desc">High to low</option>
+        </select></label
+      >
+    </div>
+  </div>
+  <div class="skeleton-grid" *ngIf="loading">
+    <div *ngFor="let n of [1,2,3,4]" class="skeleton-card"></div>
+  </div>
+  <app-product-grid *ngIf="!loading&&products.length" [products]="products"></app-product-grid>
+  <div class="empty-panel" *ngIf="!loading&&!products.length&&!error">
+    <ion-icon name="search-outline"></ion-icon>
+    <h3>No products found</h3>
+    <p>Try a different search or category.</p>
+    <button type="button" class="lime-button" (click)="q='';setCategory('All')">
+      Clear filters
+    </button>
+  </div>
+  <div class="notice-error" *ngIf="error">
+    {{error}} <button (click)="load()">Try again</button>
+  </div>
 </div>

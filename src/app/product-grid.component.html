@@ -1,22 +1,51 @@
 <div class="product-grid">
- <article class="product-card" *ngFor="let product of products">
-  <div class="product-visual">
-   <a [routerLink]="['/product',product.id]" class="product-picture" [attr.aria-label]="'View '+product.name">
-    <img [src]="product.image" [alt]="product.name" loading="lazy" (error)="imageError($event)">
-   </a>
-   <button type="button" class="heart-button" [class.favorited]="store.isFavorite(product.id)" (click)="store.toggleFavorite(product.id)" [attr.aria-label]="store.isFavorite(product.id)?'Remove from favourites':'Save to favourites'">
-    <ion-icon [name]="store.isFavorite(product.id)?'heart':'heart-outline'"></ion-icon>
-   </button>
-   <span class="item-pill" *ngIf="product.featured">Local pick</span>
-  </div>
-  <div class="product-meta">
-   <span class="product-category">{{product.category}}</span>
-   <a [routerLink]="['/product',product.id]"><h3>{{product.name}}</h3></a>
-   <div class="product-bottom">
-    <strong>{{product.price | currency:'ZAR':'symbol-narrow':'1.0-0'}}</strong>
-    <button class="mini-add" type="button" (click)="store.add(product)" [disabled]="!product.stock" [attr.aria-label]="'Add '+product.name+' to cart'"><ion-icon name="add-outline"></ion-icon></button>
-   </div>
-   <span class="stock-notice" *ngIf="product.stock<=5">{{product.stock? 'Only '+product.stock+' available':'Sold out'}}</span>
-  </div>
- </article>
+  <article class="product-card" *ngFor="let product of products">
+    <div class="product-visual">
+      <a
+        [routerLink]="['/product', product.id]"
+        class="product-picture"
+        [attr.aria-label]="'View ' + product.name"
+      >
+        <img
+          [src]="product.image"
+          [alt]="product.name"
+          loading="lazy"
+          (error)="imageError($event)"
+        />
+      </a>
+      <button
+        type="button"
+        class="heart-button"
+        [class.favorited]="store.isFavorite(product.id)"
+        (click)="store.toggleFavorite(product.id)"
+        [attr.aria-label]="
+          store.isFavorite(product.id) ? 'Remove from favourites' : 'Save to favourites'
+        "
+      >
+        <ion-icon [name]="store.isFavorite(product.id) ? 'heart' : 'heart-outline'"></ion-icon>
+      </button>
+      <span class="item-pill" *ngIf="product.featured">Local pick</span>
+    </div>
+    <div class="product-meta">
+      <span class="product-category">{{ product.category }}</span>
+      <a [routerLink]="['/product', product.id]"
+        ><h3>{{ product.name }}</h3></a
+      >
+      <div class="product-bottom">
+        <strong>{{ product.price | currency: 'ZAR' : 'symbol-narrow' : '1.0-0' }}</strong>
+        <button
+          class="mini-add"
+          type="button"
+          (click)="store.add(product)"
+          [disabled]="!product.stock"
+          [attr.aria-label]="'Add ' + product.name + ' to cart'"
+        >
+          <ion-icon name="add-outline"></ion-icon>
+        </button>
+      </div>
+      <span class="stock-notice" *ngIf="product.stock <= 5">{{
+        product.stock ? 'Only ' + product.stock + ' available' : 'Sold out'
+      }}</span>
+    </div>
+  </article>
 </div>

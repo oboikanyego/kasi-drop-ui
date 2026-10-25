@@ -27,7 +27,7 @@ import {
   shareOutline,
   shirtOutline,
   sparklesOutline,
-  trashOutline
+  trashOutline,
 } from 'ionicons/icons';
 
 /** Explicit, tree-shakable SVG icon catalogue for all Ionic templates.
@@ -48,7 +48,7 @@ export const kasiDropIcons = {
   'ellipsis-horizontal-outline': ellipsisHorizontalOutline,
   'gift-outline': giftOutline,
   'grid-outline': gridOutline,
-  'heart': heart,
+  heart: heart,
   'heart-outline': heartOutline,
   'home-outline': homeOutline,
   'information-circle-outline': informationCircleOutline,

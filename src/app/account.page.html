@@ -1,173 +1,456 @@
 <section class="container auth-layout" *ngIf="!store.user();else signedIn">
- <div class="auth-art">
-  <span class="eyebrow">KASIDROP MEMBERS</span>
-  <h2>Welcome to the <em>local side.</em></h2>
-  <p>Join KasiDrop to discover homegrown favourites, save delivery addresses and keep your orders in one place.</p>
-  <span>🇿🇦 Local roots. Delivered.</span>
- </div>
- <div class="auth-card">
-  <span class="eyebrow orange">YOUR ACCOUNT</span>
-  <h1>{{registerMode?'Join KasiDrop':'Welcome back!'}}</h1>
-  <p>{{registerMode?'Create your account and start exploring.':'Sign in to view your profile, addresses and orders.'}}</p>
-  <form (ngSubmit)="submit()">
-   <label *ngIf="registerMode">Full name<input name="name" [(ngModel)]="name" autocomplete="name" required minlength="2" maxlength="80"></label>
-   <label>Email address<input name="email" type="email" [(ngModel)]="email" autocomplete="email" required></label>
-   <label>Password<input name="password" type="password" [(ngModel)]="password" [attr.autocomplete]="registerMode?'new-password':'current-password'" required minlength="8"></label>
-   <p class="error-msg" *ngIf="error" role="alert">{{error}}</p>
-   <button type="submit" class="btn btn-orange btn-block" [disabled]="busy">{{busy?'Please wait…':registerMode?'Create account':'Sign in'}}</button>
-  </form>
-  <p class="switch-auth">{{registerMode?'Already a member?':'New to KasiDrop?'}} <button type="button" (click)="registerMode=!registerMode;error=''">{{registerMode?'Sign in':'Create an account'}}</button></p>
-  <div class="demo-credentials" *ngIf="demoLoginAvailable">
-   <strong>Temporary demo accounts</strong>
-   <p>Only available while the backend is in demo mode.</p>
-   <button type="button" (click)="fillDemo('shopper')">Fill shopper login</button>
-   <button type="button" (click)="fillDemo('admin')">Fill admin login</button>
+  <div class="auth-art">
+    <span class="eyebrow">KASIDROP MEMBERS</span>
+    <h2>Welcome to the <em>local side.</em></h2>
+    <p>
+      Join KasiDrop to discover homegrown favourites, save delivery addresses and keep your orders
+      in one place.
+    </p>
+    <span>🇿🇦 Local roots. Delivered.</span>
   </div>
- </div>
+  <div class="auth-card">
+    <span class="eyebrow orange">YOUR ACCOUNT</span>
+    <h1>{{registerMode?'Join KasiDrop':'Welcome back!'}}</h1>
+    <p>
+      {{registerMode?'Create your account and start exploring.':'Sign in to view your profile,
+      addresses and orders.'}}
+    </p>
+    <form (ngSubmit)="submit()">
+      <label *ngIf="registerMode"
+        >Full name<input
+          name="name"
+          [(ngModel)]="name"
+          autocomplete="name"
+          required
+          minlength="2"
+          maxlength="80"
+      /></label>
+      <label
+        >Email address<input
+          name="email"
+          type="email"
+          [(ngModel)]="email"
+          autocomplete="email"
+          required
+      /></label>
+      <label
+        >Password<input
+          name="password"
+          type="password"
+          [(ngModel)]="password"
+          [attr.autocomplete]="registerMode?'new-password':'current-password'"
+          required
+          minlength="8"
+      /></label>
+      <p class="error-msg" *ngIf="error" role="alert">{{error}}</p>
+      <button type="submit" class="btn btn-orange btn-block" [disabled]="busy">
+        {{busy?'Please wait…':registerMode?'Create account':'Sign in'}}
+      </button>
+    </form>
+    <p class="switch-auth">
+      {{registerMode?'Already a member?':'New to KasiDrop?'}}
+      <button type="button" (click)="registerMode=!registerMode;error=''">
+        {{registerMode?'Sign in':'Create an account'}}
+      </button>
+    </p>
+    <div class="demo-credentials" *ngIf="demoLoginAvailable">
+      <strong>Temporary demo accounts</strong>
+      <p>Only available while the backend is in demo mode.</p>
+      <button type="button" (click)="fillDemo('shopper')">Fill shopper login</button>
+      <button type="button" (click)="fillDemo('admin')">Fill admin login</button>
+    </div>
+  </div>
 </section>
 
 <ng-template #signedIn>
- <section class="profile-page container" aria-label="My KasiDrop profile">
-  <header class="profile-heading">
-   <div><span class="profile-eyebrow">YOUR KASIDROP ACCOUNT</span><h1>My profile</h1><p>Make your KasiDrop yours. Manage your details and delivery spots.</p></div>
-   <button type="button" class="profile-signout" (click)="logout()">Sign out <span aria-hidden="true">↗</span></button>
-  </header>
-  <div *ngIf="loadingProfile" class="profile-loading" role="status">Loading your profile…</div>
-  <p *ngIf="profileError" class="error-msg" role="alert">{{profileError}} <button type="button" (click)="loadProfile()" *ngIf="!profile">Retry</button></p>
-
-  <ng-container *ngIf="profile as person">
-   <div class="profile-hero">
-    <div class="profile-portrait" [attr.aria-label]="'Profile photo of '+person.name">
-     <img *ngIf="avatarSrc;else profileInitial" [src]="avatarSrc" [alt]="person.name+' profile photo'">
-     <ng-template #profileInitial><span>{{person.name.charAt(0) | uppercase}}</span></ng-template>
-    </div>
-    <div class="profile-hero-info">
-     <small>HELLO, LOCAL LEGEND</small><h2>{{person.name}}</h2>
-     <p>{{person.email}}</p>
-     <span class="profile-member" *ngIf="person.memberSince">Member since {{person.memberSince | date:'MMMM yyyy'}}</span>
-     <span class="profile-member" *ngIf="person.role==='admin'">Store administrator</span>
-    </div>
-    <div class="profile-photo-tools">
-     <label class="profile-upload">
-      <input type="file" accept="image/jpeg,image/png,image/webp" (change)="chooseAvatar($event)" [disabled]="savingAvatar" aria-label="Upload a new profile photo">
-      {{savingAvatar?'Uploading…':person.avatarUpdatedAt?'Change photo':'Upload photo'}}
-     </label>
-     <button type="button" class="profile-link-button" *ngIf="person.avatarUpdatedAt" (click)="removeAvatar()" [disabled]="savingAvatar">Remove photo</button>
-     <small>JPG, PNG or WebP · up to 5 MB</small>
-     <small>Stored privately with your account</small>
-    </div>
-   </div>
-   <p class="error-msg" *ngIf="avatarError" role="alert">{{avatarError}}</p>
-
-   <div class="profile-layout">
-    <div class="profile-column">
-     <section class="profile-panel" aria-labelledby="details-title">
-      <div class="profile-panel-top">
-       <div><span class="profile-eyebrow">PERSONAL DETAILS</span><h2 id="details-title">Your information</h2></div>
-       <button type="button" class="profile-outline-button" *ngIf="!editProfile" (click)="editProfile=true">Edit details</button>
+  <section class="profile-page container" aria-label="My KasiDrop profile">
+    <header class="profile-heading">
+      <div>
+        <span class="profile-eyebrow">YOUR KASIDROP ACCOUNT</span>
+        <h1>My profile</h1>
+        <p>Make your KasiDrop yours. Manage your details and delivery spots.</p>
       </div>
-      <div class="profile-details" *ngIf="!editProfile">
-       <div><small>Full name</small><strong>{{person.name}}</strong></div>
-       <div><small>Email address</small><strong>{{person.email}}</strong></div>
-       <div><small>Mobile number</small><strong>{{person.phone||'Not added yet'}}</strong></div>
-       <div><small>Preferred language</small><strong>{{person.preferredLanguage||'English'}}</strong></div>
-       <div class="profile-wide"><small>A little about you</small><p>{{person.about||'Add a short introduction to personalise your KasiDrop profile.'}}</p></div>
-       <div class="profile-wide"><small>Offers and updates</small><strong>{{person.marketingOptIn?'Subscribed':'Not subscribed'}}</strong></div>
-      </div>
-      <form *ngIf="editProfile" class="profile-form" (ngSubmit)="saveProfile()">
-       <div class="form-grid">
-        <label>Full name<input name="profileName" [(ngModel)]="profileForm.name" required minlength="2" maxlength="80"></label>
-        <label>Mobile number<input name="profilePhone" [(ngModel)]="profileForm.phone" type="tel" autocomplete="tel" placeholder="+27 82 123 4567" maxlength="24"></label>
-       </div>
-       <label>Preferred language
-        <select name="preferredLanguage" [(ngModel)]="profileForm.preferredLanguage">
-         <option *ngFor="let lang of languages" [value]="lang">{{lang}}</option>
-        </select>
-       </label>
-       <label>About you <small>(optional, max 250 characters)</small><textarea name="about" [(ngModel)]="profileForm.about" maxlength="250" rows="3" placeholder="A little about yourself…"></textarea></label>
-       <label class="profile-check"><input name="marketingOptIn" type="checkbox" [(ngModel)]="profileForm.marketingOptIn"><span>I'd like to hear about KasiDrop updates and offers</span></label>
-       <p class="profile-muted">Your email address is managed through your sign-in and can't be changed here.</p>
-       <div class="profile-form-actions"><button type="submit" class="btn btn-orange" [disabled]="savingProfile">{{savingProfile?'Saving…':'Save changes'}}</button><button type="button" class="profile-outline-button" (click)="cancelProfileEdit()">Cancel</button></div>
-      </form>
-     </section>
+      <button type="button" class="profile-signout" (click)="logout()">
+        Sign out <span aria-hidden="true">↗</span>
+      </button>
+    </header>
+    <div *ngIf="loadingProfile" class="profile-loading" role="status">Loading your profile…</div>
+    <p *ngIf="profileError" class="error-msg" role="alert">
+      {{profileError}} <button type="button" (click)="loadProfile()" *ngIf="!profile">Retry</button>
+    </p>
 
-     <section class="profile-panel" aria-labelledby="address-title">
-      <div class="profile-panel-top">
-       <div><span class="profile-eyebrow">DELIVERY LOCATIONS</span><h2 id="address-title">Saved addresses <span class="profile-count">{{addresses.length}} / 10</span></h2></div>
-       <button type="button" class="profile-outline-button" (click)="startAddress()" *ngIf="!showAddressForm&&addresses.length<10">+ Add address</button>
-      </div>
-      <p class="profile-muted">Save a home, work or other delivery spot. Your default address is selected at checkout.</p>
-      <div class="profile-addresses" *ngIf="addresses.length">
-       <article class="profile-address-card" *ngFor="let address of addresses" [class.is-default]="address.isDefault">
-        <div class="profile-address-top">
-         <strong>{{address.label}}{{address.nickname?' · '+address.nickname:''}}</strong>
-         <span *ngIf="address.isDefault" class="profile-default-tag">Default</span>
+    <ng-container *ngIf="profile as person">
+      <div class="profile-hero">
+        <div class="profile-portrait" [attr.aria-label]="'Profile photo of '+person.name">
+          <img
+            *ngIf="avatarSrc;else profileInitial"
+            [src]="avatarSrc"
+            [alt]="person.name+' profile photo'"
+          />
+          <ng-template #profileInitial
+            ><span>{{person.name.charAt(0) | uppercase}}</span></ng-template
+          >
         </div>
-        <p><b>{{address.recipientName}}</b> · {{address.phone}}</p>
-        <p>{{address.unit?address.unit+', ':''}}{{address.street}}</p>
-        <p>{{address.suburb?address.suburb+', ':''}}{{address.city}}, {{address.province}} · {{address.postalCode}}</p>
-        <p *ngIf="address.deliveryNotes" class="profile-muted">Delivery note: {{address.deliveryNotes}}</p>
-        <div class="profile-address-actions">
-         <button type="button" (click)="startAddress(address)">Edit</button>
-         <button type="button" (click)="setDefault(address)" *ngIf="!address.isDefault" [disabled]="savingAddress">Set as default</button>
-         <button type="button" class="is-danger" (click)="deleteAddress(address)" [disabled]="savingAddress">Remove</button>
+        <div class="profile-hero-info">
+          <small>HELLO, LOCAL LEGEND</small>
+          <h2>{{person.name}}</h2>
+          <p>{{person.email}}</p>
+          <span class="profile-member" *ngIf="person.memberSince"
+            >Member since {{person.memberSince | date:'MMMM yyyy'}}</span
+          >
+          <span class="profile-member" *ngIf="person.role==='admin'">Store administrator</span>
         </div>
-       </article>
+        <div class="profile-photo-tools">
+          <label class="profile-upload">
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              (change)="chooseAvatar($event)"
+              [disabled]="savingAvatar"
+              aria-label="Upload a new profile photo"
+            />
+            {{savingAvatar?'Uploading…':person.avatarUpdatedAt?'Change photo':'Upload photo'}}
+          </label>
+          <button
+            type="button"
+            class="profile-link-button"
+            *ngIf="person.avatarUpdatedAt"
+            (click)="removeAvatar()"
+            [disabled]="savingAvatar"
+          >
+            Remove photo
+          </button>
+          <small>JPG, PNG or WebP · up to 5 MB</small>
+          <small>Stored privately with your account</small>
+        </div>
       </div>
-      <div *ngIf="!addresses.length&&!showAddressForm" class="profile-address-empty">
-       <span>⌂</span><strong>No saved addresses yet</strong>
-       <p>Add your first delivery location for quicker checkout.</p>
-       <button type="button" class="profile-outline-button" (click)="startAddress()">Add your first address</button>
+      <p class="error-msg" *ngIf="avatarError" role="alert">{{avatarError}}</p>
+
+      <div class="profile-layout">
+        <div class="profile-column">
+          <section class="profile-panel" aria-labelledby="details-title">
+            <div class="profile-panel-top">
+              <div>
+                <span class="profile-eyebrow">PERSONAL DETAILS</span>
+                <h2 id="details-title">Your information</h2>
+              </div>
+              <button
+                type="button"
+                class="profile-outline-button"
+                *ngIf="!editProfile"
+                (click)="editProfile=true"
+              >
+                Edit details
+              </button>
+            </div>
+            <div class="profile-details" *ngIf="!editProfile">
+              <div><small>Full name</small><strong>{{person.name}}</strong></div>
+              <div><small>Email address</small><strong>{{person.email}}</strong></div>
+              <div>
+                <small>Mobile number</small><strong>{{person.phone||'Not added yet'}}</strong>
+              </div>
+              <div>
+                <small>Preferred language</small
+                ><strong>{{person.preferredLanguage||'English'}}</strong>
+              </div>
+              <div class="profile-wide">
+                <small>A little about you</small>
+                <p>
+                  {{person.about||'Add a short introduction to personalise your KasiDrop profile.'}}
+                </p>
+              </div>
+              <div class="profile-wide">
+                <small>Offers and updates</small
+                ><strong>{{person.marketingOptIn?'Subscribed':'Not subscribed'}}</strong>
+              </div>
+            </div>
+            <form *ngIf="editProfile" class="profile-form" (ngSubmit)="saveProfile()">
+              <div class="form-grid">
+                <label
+                  >Full name<input
+                    name="profileName"
+                    [(ngModel)]="profileForm.name"
+                    required
+                    minlength="2"
+                    maxlength="80"
+                /></label>
+                <label
+                  >Mobile number<input
+                    name="profilePhone"
+                    [(ngModel)]="profileForm.phone"
+                    type="tel"
+                    autocomplete="tel"
+                    placeholder="+27 82 123 4567"
+                    maxlength="24"
+                /></label>
+              </div>
+              <label
+                >Preferred language
+                <select name="preferredLanguage" [(ngModel)]="profileForm.preferredLanguage">
+                  <option *ngFor="let lang of languages" [value]="lang">{{lang}}</option>
+                </select>
+              </label>
+              <label
+                >About you <small>(optional, max 250 characters)</small
+                ><textarea
+                  name="about"
+                  [(ngModel)]="profileForm.about"
+                  maxlength="250"
+                  rows="3"
+                  placeholder="A little about yourself…"
+                ></textarea>
+              </label>
+              <label class="profile-check"
+                ><input
+                  name="marketingOptIn"
+                  type="checkbox"
+                  [(ngModel)]="profileForm.marketingOptIn"
+                /><span>I'd like to hear about KasiDrop updates and offers</span></label
+              >
+              <p class="profile-muted">
+                Your email address is managed through your sign-in and can't be changed here.
+              </p>
+              <div class="profile-form-actions">
+                <button type="submit" class="btn btn-orange" [disabled]="savingProfile">
+                  {{savingProfile?'Saving…':'Save changes'}}</button
+                ><button type="button" class="profile-outline-button" (click)="cancelProfileEdit()">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <section class="profile-panel" aria-labelledby="address-title">
+            <div class="profile-panel-top">
+              <div>
+                <span class="profile-eyebrow">DELIVERY LOCATIONS</span>
+                <h2 id="address-title">
+                  Saved addresses <span class="profile-count">{{addresses.length}} / 10</span>
+                </h2>
+              </div>
+              <button
+                type="button"
+                class="profile-outline-button"
+                (click)="startAddress()"
+                *ngIf="!showAddressForm&&addresses.length<10"
+              >
+                + Add address
+              </button>
+            </div>
+            <p class="profile-muted">
+              Save a home, work or other delivery spot. Your default address is selected at
+              checkout.
+            </p>
+            <div class="profile-addresses" *ngIf="addresses.length">
+              <article
+                class="profile-address-card"
+                *ngFor="let address of addresses"
+                [class.is-default]="address.isDefault"
+              >
+                <div class="profile-address-top">
+                  <strong>{{address.label}}{{address.nickname?' · '+address.nickname:''}}</strong>
+                  <span *ngIf="address.isDefault" class="profile-default-tag">Default</span>
+                </div>
+                <p><b>{{address.recipientName}}</b> · {{address.phone}}</p>
+                <p>{{address.unit?address.unit+', ':''}}{{address.street}}</p>
+                <p>
+                  {{address.suburb?address.suburb+', ':''}}{{address.city}}, {{address.province}} ·
+                  {{address.postalCode}}
+                </p>
+                <p *ngIf="address.deliveryNotes" class="profile-muted">
+                  Delivery note: {{address.deliveryNotes}}
+                </p>
+                <div class="profile-address-actions">
+                  <button type="button" (click)="startAddress(address)">Edit</button>
+                  <button
+                    type="button"
+                    (click)="setDefault(address)"
+                    *ngIf="!address.isDefault"
+                    [disabled]="savingAddress"
+                  >
+                    Set as default
+                  </button>
+                  <button
+                    type="button"
+                    class="is-danger"
+                    (click)="deleteAddress(address)"
+                    [disabled]="savingAddress"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </article>
+            </div>
+            <div *ngIf="!addresses.length&&!showAddressForm" class="profile-address-empty">
+              <span>⌂</span><strong>No saved addresses yet</strong>
+              <p>Add your first delivery location for quicker checkout.</p>
+              <button type="button" class="profile-outline-button" (click)="startAddress()">
+                Add your first address
+              </button>
+            </div>
+
+            <form *ngIf="showAddressForm" class="profile-address-form" (ngSubmit)="saveAddress()">
+              <h3>{{editingAddressId?'Edit delivery address':'Add a delivery address'}}</h3>
+              <div class="form-grid">
+                <label
+                  >Address type
+                  <select name="label" [(ngModel)]="addressForm.label">
+                    <option *ngFor="let label of addressLabels" [value]="label">{{label}}</option>
+                  </select></label
+                >
+                <label
+                  >Label (optional)
+                  <input
+                    name="nickname"
+                    [(ngModel)]="addressForm.nickname"
+                    maxlength="32"
+                    placeholder="e.g. Mom's place"
+                /></label>
+              </div>
+              <div class="form-grid">
+                <label
+                  >Recipient name
+                  <input
+                    name="recipientName"
+                    [(ngModel)]="addressForm.recipientName"
+                    required
+                    minlength="2"
+                    maxlength="80"
+                    autocomplete="name"
+                /></label>
+                <label
+                  >Phone number
+                  <input
+                    name="recipientPhone"
+                    [(ngModel)]="addressForm.phone"
+                    required
+                    minlength="8"
+                    maxlength="24"
+                    autocomplete="tel"
+                    type="tel"
+                /></label>
+              </div>
+              <label
+                >Street address
+                <input
+                  name="street"
+                  [(ngModel)]="addressForm.street"
+                  required
+                  minlength="5"
+                  maxlength="150"
+                  autocomplete="address-line1"
+                  placeholder="Street number and street name"
+              /></label>
+              <div class="form-grid">
+                <label
+                  >Unit / apartment (optional)
+                  <input
+                    name="unit"
+                    [(ngModel)]="addressForm.unit"
+                    maxlength="80"
+                    autocomplete="address-line2"
+                /></label>
+                <label
+                  >Suburb (optional)
+                  <input name="suburb" [(ngModel)]="addressForm.suburb" maxlength="100"
+                /></label>
+              </div>
+              <div class="form-grid">
+                <label
+                  >City / town
+                  <input
+                    name="city"
+                    [(ngModel)]="addressForm.city"
+                    required
+                    minlength="2"
+                    maxlength="100"
+                    autocomplete="address-level2"
+                /></label>
+                <label
+                  >Province
+                  <select name="province" [(ngModel)]="addressForm.province">
+                    <option *ngFor="let province of provinces" [value]="province">
+                      {{province}}
+                    </option>
+                  </select></label
+                >
+              </div>
+              <div class="form-grid">
+                <label
+                  >Postal code
+                  <input
+                    name="postalCode"
+                    [(ngModel)]="addressForm.postalCode"
+                    required
+                    minlength="3"
+                    maxlength="10"
+                    autocomplete="postal-code"
+                /></label>
+                <label class="profile-check"
+                  ><input
+                    type="checkbox"
+                    name="isDefault"
+                    [(ngModel)]="addressForm.isDefault"
+                  /><span>Make this my default address</span></label
+                >
+              </div>
+              <label
+                >Delivery instructions (optional)
+                <textarea
+                  name="deliveryNotes"
+                  [(ngModel)]="addressForm.deliveryNotes"
+                  rows="2"
+                  maxlength="180"
+                  placeholder="Building access, drop-off details…"
+                ></textarea>
+              </label>
+              <p *ngIf="addressError" class="error-msg" role="alert">{{addressError}}</p>
+              <div class="profile-form-actions">
+                <button class="btn btn-orange" type="submit" [disabled]="savingAddress">
+                  {{savingAddress?'Saving…':'Save address'}}</button
+                ><button
+                  type="button"
+                  class="profile-outline-button"
+                  (click)="cancelAddress()"
+                  [disabled]="savingAddress"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+            <p *ngIf="addressError&&!showAddressForm" class="error-msg" role="alert">
+              {{addressError}}
+            </p>
+          </section>
+        </div>
+
+        <aside class="profile-sidebar">
+          <section class="profile-panel profile-summary">
+            <span class="profile-eyebrow">AT A GLANCE</span>
+            <h2>Your KasiDrop</h2>
+            <div>
+              <small>Account type</small
+              ><strong>{{person.role==='admin'?'Administrator':'Shopper'}}</strong>
+            </div>
+            <div><small>Saved locations</small><strong>{{addresses.length}}</strong></div>
+            <div>
+              <small>Default delivery</small
+              ><strong>{{defaultAddress?.label||'Not selected'}}</strong>
+            </div>
+          </section>
+          <section class="profile-panel profile-shortcuts">
+            <h2>Quick links</h2>
+            <a routerLink="/orders">My orders <span>↗</span></a>
+            <a routerLink="/favorites">Saved favourites <span>↗</span></a>
+            <a routerLink="/checkout">Go to checkout <span>↗</span></a>
+            <a routerLink="/admin" *ngIf="person.role==='admin'">Store dashboard <span>↗</span></a>
+          </section>
+          <p class="profile-disclaimer">
+            Your profile, photo and saved addresses are private and only accessible through your
+            signed-in account.
+          </p>
+        </aside>
       </div>
-
-      <form *ngIf="showAddressForm" class="profile-address-form" (ngSubmit)="saveAddress()">
-       <h3>{{editingAddressId?'Edit delivery address':'Add a delivery address'}}</h3>
-       <div class="form-grid">
-        <label>Address type <select name="label" [(ngModel)]="addressForm.label"><option *ngFor="let label of addressLabels" [value]="label">{{label}}</option></select></label>
-        <label>Label (optional) <input name="nickname" [(ngModel)]="addressForm.nickname" maxlength="32" placeholder="e.g. Mom's place"></label>
-       </div>
-       <div class="form-grid">
-        <label>Recipient name <input name="recipientName" [(ngModel)]="addressForm.recipientName" required minlength="2" maxlength="80" autocomplete="name"></label>
-        <label>Phone number <input name="recipientPhone" [(ngModel)]="addressForm.phone" required minlength="8" maxlength="24" autocomplete="tel" type="tel"></label>
-       </div>
-       <label>Street address <input name="street" [(ngModel)]="addressForm.street" required minlength="5" maxlength="150" autocomplete="address-line1" placeholder="Street number and street name"></label>
-       <div class="form-grid">
-        <label>Unit / apartment (optional) <input name="unit" [(ngModel)]="addressForm.unit" maxlength="80" autocomplete="address-line2"></label>
-        <label>Suburb (optional) <input name="suburb" [(ngModel)]="addressForm.suburb" maxlength="100"></label>
-       </div>
-       <div class="form-grid">
-        <label>City / town <input name="city" [(ngModel)]="addressForm.city" required minlength="2" maxlength="100" autocomplete="address-level2"></label>
-        <label>Province <select name="province" [(ngModel)]="addressForm.province"><option *ngFor="let province of provinces" [value]="province">{{province}}</option></select></label>
-       </div>
-       <div class="form-grid">
-        <label>Postal code <input name="postalCode" [(ngModel)]="addressForm.postalCode" required minlength="3" maxlength="10" autocomplete="postal-code"></label>
-        <label class="profile-check"><input type="checkbox" name="isDefault" [(ngModel)]="addressForm.isDefault"><span>Make this my default address</span></label>
-       </div>
-       <label>Delivery instructions (optional) <textarea name="deliveryNotes" [(ngModel)]="addressForm.deliveryNotes" rows="2" maxlength="180" placeholder="Building access, drop-off details…"></textarea></label>
-       <p *ngIf="addressError" class="error-msg" role="alert">{{addressError}}</p>
-       <div class="profile-form-actions"><button class="btn btn-orange" type="submit" [disabled]="savingAddress">{{savingAddress?'Saving…':'Save address'}}</button><button type="button" class="profile-outline-button" (click)="cancelAddress()" [disabled]="savingAddress">Cancel</button></div>
-      </form>
-      <p *ngIf="addressError&&!showAddressForm" class="error-msg" role="alert">{{addressError}}</p>
-     </section>
-    </div>
-
-    <aside class="profile-sidebar">
-     <section class="profile-panel profile-summary">
-      <span class="profile-eyebrow">AT A GLANCE</span><h2>Your KasiDrop</h2>
-      <div><small>Account type</small><strong>{{person.role==='admin'?'Administrator':'Shopper'}}</strong></div>
-      <div><small>Saved locations</small><strong>{{addresses.length}}</strong></div>
-      <div><small>Default delivery</small><strong>{{defaultAddress?.label||'Not selected'}}</strong></div>
-     </section>
-     <section class="profile-panel profile-shortcuts">
-      <h2>Quick links</h2>
-      <a routerLink="/orders">My orders <span>↗</span></a>
-      <a routerLink="/favorites">Saved favourites <span>↗</span></a>
-      <a routerLink="/checkout">Go to checkout <span>↗</span></a>
-      <a routerLink="/admin" *ngIf="person.role==='admin'">Store dashboard <span>↗</span></a>
-     </section>
-     <p class="profile-disclaimer">Your profile, photo and saved addresses are private and only accessible through your signed-in account.</p>
-    </aside>
-   </div>
-  </ng-container>
- </section>
+    </ng-container>
+  </section>
 </ng-template>

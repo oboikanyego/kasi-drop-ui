@@ -1,7 +1,27 @@
 <div class="favorites-page shell">
- <div class="mobile-page-title"><a routerLink="/" class="circle-action" aria-label="Back to home"><ion-icon name="chevron-back-outline"></ion-icon></a><h1>Favorites</h1><a routerLink="/cart" class="circle-action" aria-label="Cart"><ion-icon name="bag-handle-outline"></ion-icon></a></div>
- <div class="catalogue-heading"><span class="kicker">YOUR PICKS</span><h1>Saved for <span>later.</span></h1><p>All your favourite local finds, in one place.</p></div>
- <app-product-grid *ngIf="favoriteProducts.length" [products]="favoriteProducts"></app-product-grid>
- <div class="empty-panel" *ngIf="!loading&&!favoriteProducts.length"><ion-icon name="heart-outline"></ion-icon><h2>No favorites yet</h2><p>Tap the heart on a product to save it here.</p><a class="lime-button" routerLink="/shop">Explore products</a></div>
- <div class="notice-error" *ngIf="error">{{error}}</div>
+  <div class="mobile-page-title">
+    <a routerLink="/" class="circle-action" aria-label="Back to home"
+      ><ion-icon name="chevron-back-outline"></ion-icon
+    ></a>
+    <h1>Favorites</h1>
+    <a routerLink="/cart" class="circle-action" aria-label="Cart"
+      ><ion-icon name="bag-handle-outline"></ion-icon
+    ></a>
+  </div>
+  <div class="catalogue-heading">
+    <span class="kicker">YOUR PICKS</span>
+    <h1>Saved for <span>later.</span></h1>
+    <p>All your favourite local finds, in one place.</p>
+  </div>
+  <app-product-grid
+    *ngIf="favoriteProducts.length"
+    [products]="favoriteProducts"
+  ></app-product-grid>
+  <div class="empty-panel" *ngIf="!loading&&!favoriteProducts.length">
+    <ion-icon name="heart-outline"></ion-icon>
+    <h2>No favorites yet</h2>
+    <p>Tap the heart on a product to save it here.</p>
+    <a class="lime-button" routerLink="/shop">Explore products</a>
+  </div>
+  <div class="notice-error" *ngIf="error">{{error}}</div>
 </div>

@@ -14,9 +14,7 @@
             "outputPath": "dist/kasi-drop-ui",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/assets",
@@ -26,10 +24,7 @@
                 "output": "/svg"
               }
             ],
-            "styles": [
-              "src/global.scss",
-              "src/styles.scss"
-            ]
+            "styles": ["src/global.scss", "src/styles.scss"]
           },
           "configurations": {
             "production": {

@@ -1,27 +1,89 @@
 <div class="product-page shell">
- <div *ngIf="product as p" class="product-layout">
-  <div class="product-photo-area">
-   <div class="product-image-controls">
-    <a routerLink="/shop" class="circle-action" aria-label="Back to catalog"><ion-icon name="chevron-back-outline"></ion-icon></a>
-    <div class="control-pair">
-     <button type="button" class="circle-action" [class.liked]="store.isFavorite(p.id)" (click)="store.toggleFavorite(p.id)" [attr.aria-label]="store.isFavorite(p.id)?'Remove from favorites':'Add to favorites'"><ion-icon [name]="store.isFavorite(p.id)?'heart':'heart-outline'"></ion-icon></button>
-     <button type="button" class="circle-action" (click)="share()" aria-label="Share product"><ion-icon name="share-outline"></ion-icon></button>
+  <div *ngIf="product as p" class="product-layout">
+    <div class="product-photo-area">
+      <div class="product-image-controls">
+        <a routerLink="/shop" class="circle-action" aria-label="Back to catalog"
+          ><ion-icon name="chevron-back-outline"></ion-icon
+        ></a>
+        <div class="control-pair">
+          <button
+            type="button"
+            class="circle-action"
+            [class.liked]="store.isFavorite(p.id)"
+            (click)="store.toggleFavorite(p.id)"
+            [attr.aria-label]="store.isFavorite(p.id)?'Remove from favorites':'Add to favorites'"
+          >
+            <ion-icon [name]="store.isFavorite(p.id)?'heart':'heart-outline'"></ion-icon>
+          </button>
+          <button type="button" class="circle-action" (click)="share()" aria-label="Share product">
+            <ion-icon name="share-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+      <img class="detail-main-image" [src]="p.image" [alt]="p.name" (error)="imageError($event)" />
+      <div class="photo-label">PROUDLY LOCAL</div>
     </div>
-   </div>
-   <img class="detail-main-image" [src]="p.image" [alt]="p.name" (error)="imageError($event)">
-   <div class="photo-label">PROUDLY LOCAL</div>
+    <div class="product-info-area">
+      <div class="detail-overline">{{p.category}} <span>·</span> KASIDROP SELECT</div>
+      <h1>{{p.name}}</h1>
+      <div class="attribute-row">
+        <span><ion-icon name="checkmark-circle-outline"></ion-icon> Locally curated</span
+        ><span><ion-icon name="cube-outline"></ion-icon> {{p.stock}} available</span>
+      </div>
+      <div class="price-panel">
+        <div>
+          <strong>{{p.price | currency:'ZAR':'symbol-narrow':'1.0-0'}}</strong
+          ><small>Price includes VAT where applicable</small>
+        </div>
+        <ion-icon name="information-circle-outline" aria-hidden="true"></ion-icon>
+      </div>
+      <h2>Product details</h2>
+      <p class="product-description">{{p.description}}</p>
+      <div class="availability">
+        <span class="availability-dot" [class.out]="!p.stock"></span> {{p.stock?'In stock and ready
+        to order':'Currently out of stock'}}
+      </div>
+      <div class="product-purchase">
+        <div class="quantity-stepper">
+          <button
+            type="button"
+            (click)="adjust(-1)"
+            [disabled]="quantity<=1"
+            aria-label="Decrease quantity"
+          >
+            <ion-icon name="remove-outline"></ion-icon></button
+          ><span>{{quantity}}</span
+          ><button
+            type="button"
+            (click)="adjust(1)"
+            [disabled]="quantity>=p.stock"
+            aria-label="Increase quantity"
+          >
+            <ion-icon name="add-outline"></ion-icon>
+          </button>
+        </div>
+        <button
+          class="lime-button buy-button"
+          type="button"
+          [disabled]="!p.stock"
+          (click)="store.add(p,quantity)"
+        >
+          Add to cart <ion-icon name="bag-handle-outline"></ion-icon>
+        </button>
+      </div>
+      <p class="delivery-help">
+        <ion-icon name="location-outline"></ion-icon> Delivery across South Africa · Free over R750
+      </p>
+    </div>
   </div>
-  <div class="product-info-area">
-   <div class="detail-overline">{{p.category}} <span>·</span> KASIDROP SELECT</div>
-   <h1>{{p.name}}</h1>
-   <div class="attribute-row"><span><ion-icon name="checkmark-circle-outline"></ion-icon> Locally curated</span><span><ion-icon name="cube-outline"></ion-icon> {{p.stock}} available</span></div>
-   <div class="price-panel"><div><strong>{{p.price | currency:'ZAR':'symbol-narrow':'1.0-0'}}</strong><small>Price includes VAT where applicable</small></div><ion-icon name="information-circle-outline" aria-hidden="true"></ion-icon></div>
-   <h2>Product details</h2><p class="product-description">{{p.description}}</p>
-   <div class="availability"><span class="availability-dot" [class.out]="!p.stock"></span> {{p.stock?'In stock and ready to order':'Currently out of stock'}}</div>
-   <div class="product-purchase"><div class="quantity-stepper"><button type="button" (click)="adjust(-1)" [disabled]="quantity<=1" aria-label="Decrease quantity"><ion-icon name="remove-outline"></ion-icon></button><span>{{quantity}}</span><button type="button" (click)="adjust(1)" [disabled]="quantity>=p.stock" aria-label="Increase quantity"><ion-icon name="add-outline"></ion-icon></button></div><button class="lime-button buy-button" type="button" [disabled]="!p.stock" (click)="store.add(p,quantity)">Add to cart <ion-icon name="bag-handle-outline"></ion-icon></button></div>
-   <p class="delivery-help"><ion-icon name="location-outline"></ion-icon> Delivery across South Africa · Free over R750</p>
-  </div>
- </div>
- <section class="related-section" *ngIf="similar.length"><div class="section-title-row"><h2>You may also like</h2><a routerLink="/shop">See all <span class="tiny-arrow"><ion-icon name="chevron-forward-outline"></ion-icon></span></a></div><app-product-grid [products]="similar"></app-product-grid></section>
- <div class="notice-error" *ngIf="error">{{error}} <a routerLink="/shop">Back to catalog</a></div>
+  <section class="related-section" *ngIf="similar.length">
+    <div class="section-title-row">
+      <h2>You may also like</h2>
+      <a routerLink="/shop"
+        >See all <span class="tiny-arrow"><ion-icon name="chevron-forward-outline"></ion-icon></span
+      ></a>
+    </div>
+    <app-product-grid [products]="similar"></app-product-grid>
+  </section>
+  <div class="notice-error" *ngIf="error">{{error}} <a routerLink="/shop">Back to catalog</a></div>
 </div>
