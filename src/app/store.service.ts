@@ -4,6 +4,8 @@ import {catchError,of,tap,throwError,timeout} from 'rxjs';
 import {previewProducts,searchPreview} from './preview-catalogue';
 export type Product={id:string;name:string;description:string;category:string;price:number;stock:number;image:string;tags:string[];featured:boolean;active:boolean};
 export type CartLine={product:Product;quantity:number};
+export type PurchasedLine={productId:string;quantity:number};
+export type PendingCheckout={orderId:string;userId:string;items:PurchasedLine[]};
 
 export type AddressLabel='Home'|'Work'|'Other';
 export type SavedAddress={
@@ -51,6 +53,37 @@ export class StoreService{
  remove(id:string){this.cart.update(lines=>lines.filter(l=>l.product.id!==id));this.selectedIds.update(ids=>ids.filter(x=>x!==id));this.persist();}
  clear(){this.cart.set([]);this.selectedIds.set([]);this.persist();}
  clearSelected(){const selected=new Set(this.selectedIds());this.cart.update(lines=>lines.filter(l=>!selected.has(l.product.id)));this.selectedIds.set([]);this.persist();}
+ /** Never clear on redirect; store a per-account purchase snapshot until backend confirms payment. */
+ rememberPendingCheckout(orderId:string,items:PurchasedLine[]){
+  const userId=this.user()?.id;
+  if(!userId||!orderId||items.length===0)return;
+  sessionStorage.setItem('kasi_pending_checkout',JSON.stringify({orderId,userId,items}));
+ }
+ pendingCheckout():PendingCheckout|null{
+  try{
+   const data=JSON.parse(sessionStorage.getItem('kasi_pending_checkout')||'null') as PendingCheckout|null;
+   if(!data||data.userId!==this.user()?.id||typeof data.orderId!=='string'||!Array.isArray(data.items))return null;
+   if(!data.items.every(x=>typeof x.productId==='string'&&Number.isInteger(x.quantity)&&x.quantity>0))return null;
+   return data;
+  }catch{return null;}
+ }
+ /** Run only after matching backend order is verified paid. Preserve unchecked/newly-added quantities. */
+ completeVerifiedCheckout(order:Order):boolean{
+  const pending=this.pendingCheckout();
+  if(!pending||pending.orderId!==order.id||!['paid','processing','shipped','delivered','demo_paid'].includes(order.status))return false;
+  this.cart.update(lines=>lines.flatMap(line=>{
+   const purchased=pending.items.find(item=>item.productId===line.product.id);
+   if(!purchased)return [line];
+   const left=line.quantity-purchased.quantity;
+   return left>0?[{...line,quantity:left}]:[];
+  }));
+  const remaining=new Set(this.cart().map(line=>line.product.id));
+  this.selectedIds.update(ids=>ids.filter(id=>remaining.has(id)));
+  this.persist();
+  sessionStorage.removeItem('kasi_pending_checkout');
+  this.notify('Payment confirmed — purchased items removed from your bag.');
+  return true;
+ }
  isFavorite(id:string){return this.favorites().includes(id);}
  toggleFavorite(id:string){this.favorites.update(ids=>ids.includes(id)?ids.filter(x=>x!==id):[...ids,id]);localStorage.setItem('kasi_favorites',JSON.stringify(this.favorites()));this.notify(this.isFavorite(id)?'Saved to favourites':'Removed from favourites');}
  isSelected(id:string){return this.selectedIds().includes(id);}
@@ -62,7 +95,7 @@ export class StoreService{
   const updated={...user,name};
   this.user.set(updated);localStorage.setItem('kasi_user',JSON.stringify(updated));
  }
- logout(){localStorage.removeItem('kasi_token');localStorage.removeItem('kasi_user');this.user.set(null);}
+ logout(){localStorage.removeItem('kasi_token');localStorage.removeItem('kasi_user');sessionStorage.removeItem('kasi_pending_checkout');this.user.set(null);}
  notify(message:string){this.toast.set(message);setTimeout(()=>{if(this.toast()===message)this.toast.set('')},3000);}
  private persist(){localStorage.setItem('kasi_cart',JSON.stringify(this.cart()));localStorage.setItem('kasi_selected',JSON.stringify(this.selectedIds()));}
 }
