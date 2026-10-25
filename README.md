@@ -11,6 +11,12 @@
 
 The app calls the API at relative path \`/api\` so Netlify proxies requests via \`netlify.toml\`. Configure the Render service URL in that file if your assigned hostname differs. The UI needs the API for products, login and checkout.
 
+## Checks
+
+- `npm run lint`: ESLint on the app, tests and config
+- `npm test`: fast unit and source checks (`tests/`)
+- `npm run test:e2e`: browser tests (`e2e/`) for checkout, PayFast return and admin flows. They drive the production build against a recording stub API (`e2e/stub-server.mjs`), so run `npm run build` first. Locally, install Chromium once with `npx playwright install chromium`.
+
 ## Journey coverage
 
 - Homepage, featured products, categories, catalogue filters, product details
