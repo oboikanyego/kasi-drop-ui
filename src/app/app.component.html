@@ -55,8 +55,9 @@
     <button type="button" (click)="chatOpen.set(false)" aria-label="Close assistant"><ion-icon name="close-outline"></ion-icon></button>
    </div>
    <div class="assistant-thread" role="log" aria-live="polite">
-    <div class="assistant-message" *ngFor="let message of chatMessages()" [class.sent]="message.from==='user'">
-     <p>{{message.text}}</p>
+    <div class="assistant-message" *ngFor="let message of chatMessages()" [class.sent]="message.from==='user'" [attr.aria-label]="message.from==='user'?'Your message':'Kasi AI response'">
+     <span class="assistant-message-label">{{message.from==='user'?'You':'Kasi AI'}}</span>
+     <p class="assistant-bubble">{{message.text}}</p>
      <div class="assistant-suggestions" *ngIf="message.products?.length" aria-label="Suggested products">
       <article class="assistant-product" *ngFor="let product of message.products">
        <a [routerLink]="['/product',product.id]" (click)="chatOpen.set(false)" [attr.aria-label]="'View '+product.name">
@@ -73,7 +74,7 @@
       </article>
      </div>
     </div>
-    <p *ngIf="thinking()">Checking local products…</p>
+    <div class="assistant-message assistant-thinking" *ngIf="thinking()" role="status"><span class="assistant-message-label">Kasi AI</span><p class="assistant-bubble">Checking local products…</p></div>
    </div>
    <form class="assistant-compose" (ngSubmit)="sendChat()">
     <input name="message" [(ngModel)]="chatText" maxlength="400" placeholder="A gift under R500…" aria-label="Message Kasi AI">

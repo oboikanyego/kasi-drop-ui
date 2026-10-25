@@ -461,3 +461,27 @@ ion-icon{vertical-align:middle}
 .assistant-product-details small.out-of-stock{color:#b65d41}
 .assistant-add{display:grid;place-items:center;flex:0 0 33px;height:33px;border:0;border-radius:9px;background:var(--lime);color:#20251d;font-size:20px}
 .assistant-add:disabled{background:#eceeed;color:#8a918d}
+
+/* Kasi AI conversation: message ownership must be unmistakable on mobile and desktop. */
+.assistant-thread .assistant-message{width:100%;align-items:flex-start;gap:5px}
+.assistant-thread .assistant-message.sent{align-items:flex-end}
+.assistant-thread .assistant-message-label{display:block;padding:0 5px;font-size:10px;font-weight:800;letter-spacing:.025em;color:#65716c;line-height:1.3}
+.assistant-thread .assistant-message.sent .assistant-message-label{color:#54711a;text-align:right}
+.assistant-thread .assistant-message .assistant-bubble{
+ align-self:flex-start;max-width:88%;margin:0;padding:12px 14px;
+ background:#f1f3f4;color:#28332d;border:1px solid #e7ebea;
+ border-radius:14px 14px 14px 4px;font-size:13px;line-height:1.55;
+ white-space:pre-wrap;overflow-wrap:anywhere;
+}
+.assistant-thread .assistant-message.sent .assistant-bubble{
+ align-self:flex-end;background:#def5a1;color:#26380a;border:1px solid #cae98b;
+ border-radius:14px 14px 4px 14px;
+}
+.assistant-thread .assistant-message.assistant-thinking .assistant-bubble{
+ background:#f1f3f4;color:#58665c;font-style:italic;
+}
+.assistant-thread .assistant-message .assistant-suggestions{align-self:stretch;max-width:100%;margin-top:4px}
+@media(max-width:480px){
+ .assistant-thread{padding:13px;gap:14px}
+ .assistant-thread .assistant-message .assistant-bubble{max-width:92%}
+}
