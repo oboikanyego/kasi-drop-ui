@@ -417,3 +417,26 @@ ion-icon{vertical-align:middle}
  .identity-brand-image{width:154px}
  .desktop-header-inner{gap:16px}
 }
+
+/* Brand lockup fallback guarantees a readable logo even when an image cannot decode. */
+.kasi-wordmark-fallback,.mobile-brand-lockup{display:inline-flex;align-items:center;gap:8px;color:#15201b;text-decoration:none;min-width:0}
+.kasi-wordmark-fallback img{width:43px;height:43px;object-fit:contain;border-radius:10px;flex-shrink:0}
+.kasi-wordmark-copy{display:flex;flex-direction:column;line-height:1;min-width:0}
+.kasi-wordmark-copy strong{font-family:'Outfit','DM Sans',sans-serif;font-size:27px;font-weight:800;letter-spacing:-1.5px;white-space:nowrap}
+.kasi-wordmark-copy strong b{color:#9bd300;font-weight:800}
+.kasi-wordmark-copy small{font-family:'DM Sans',sans-serif;font-size:6.7px;letter-spacing:.12em;font-weight:750;color:#6b716e;margin-top:5px;white-space:nowrap}
+.footer-lockup .kasi-wordmark-copy strong{font-size:23px}
+.footer-lockup img{width:38px;height:38px}
+.mobile-brand-lockup{display:none}
+@media(max-width:700px){
+ .mobile-home-top .mobile-brand-lockup{display:inline-flex;flex-shrink:0;gap:7px}
+ .mobile-brand-lockup .mobile-brand-image{width:42px;height:42px;flex:0 0 42px;border-radius:12px;object-fit:cover}
+ .mobile-brand-lockup .kasi-wordmark-copy strong{font-size:27px}
+ .mobile-brand-lockup .kasi-wordmark-copy small{font-size:6px}
+ .mobile-home-top .delivery-label{display:none}
+ .mobile-home-top{justify-content:space-between}
+}
+@media(max-width:340px){
+ .mobile-brand-lockup .kasi-wordmark-copy strong{font-size:24px}
+ .mobile-brand-lockup .kasi-wordmark-copy small{font-size:5.5px}
+}

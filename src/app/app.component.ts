@@ -12,6 +12,7 @@ export class AppComponent {
  readonly api=inject(ApiService);
  readonly router=inject(Router);
  search='';
+ brandLogoFailed=false;
  chatOpen=signal(false);
  chatText='';
  thinking=signal(false);
