@@ -2,14 +2,11 @@ import {Component,inject,signal} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Router,RouterLink,RouterLinkActive,RouterOutlet} from '@angular/router';
-import {IonicModule} from '@ionic/angular';
-import {addIcons} from 'ionicons';
-import {homeOutline,home,gridOutline,grid,bagHandleOutline,bagHandle,heartOutline,heart,personCircleOutline,personCircle,searchOutline,arrowForwardOutline,chevronForwardOutline,chevronBackOutline,informationCircleOutline,locationOutline,notificationsOutline,giftOutline,flameOutline,leafOutline,cafeOutline,shirtOutline,colorPaletteOutline,cubeOutline,arrowBackOutline,shareOutline,addOutline,removeOutline,ellipsisHorizontalOutline,trashOutline,checkmarkOutline,sparklesOutline,closeOutline,sendOutline,logOutOutline,personOutline,storefrontOutline,optionsOutline,checkmarkCircleOutline,menuOutline} from 'ionicons/icons';
+import { IonApp, IonContent, IonIcon } from '@ionic/angular/standalone';
 import {ApiService,StoreService} from './store.service';
 
-addIcons({homeOutline,home,gridOutline,grid,bagHandleOutline,bagHandle,heartOutline,heart,personCircleOutline,personCircle,searchOutline,arrowForwardOutline,chevronForwardOutline,chevronBackOutline,locationOutline,notificationsOutline,giftOutline,flameOutline,leafOutline,cafeOutline,shirtOutline,colorPaletteOutline,cubeOutline,arrowBackOutline,shareOutline,addOutline,removeOutline,ellipsisHorizontalOutline,trashOutline,checkmarkOutline,sparklesOutline,closeOutline,sendOutline,logOutOutline,personOutline,storefrontOutline,optionsOutline,checkmarkCircleOutline,menuOutline});
 
-@Component({selector:'app-root',standalone:true,imports:[CommonModule,FormsModule,RouterLink,RouterLinkActive,RouterOutlet,IonicModule],templateUrl:'./app.component.html',styleUrls:['./preview-status.scss']})
+@Component({selector:'app-root',standalone:true,imports:[CommonModule,FormsModule,RouterLink,RouterLinkActive,RouterOutlet,IonApp,IonContent,IonIcon],templateUrl:'./app.component.html',styleUrls:['./preview-status.scss']})
 export class AppComponent {
  readonly store=inject(StoreService);
  readonly api=inject(ApiService);

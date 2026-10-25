@@ -2,9 +2,10 @@ import {Component,inject,OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Router,RouterLink} from '@angular/router';
-import {IonicModule} from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
+import { IonIcon } from '@ionic/angular/standalone';
 import {ApiService,StoreService,Order} from './store.service';
-@Component({standalone:true,imports:[CommonModule,FormsModule,RouterLink,IonicModule],templateUrl:'./cart.page.html'})
+@Component({standalone:true,imports:[CommonModule,FormsModule,RouterLink,IonIcon],templateUrl:'./cart.page.html'})
 export class CartPage{store=inject(StoreService);api=inject(ApiService);}
 @Component({standalone:true,imports:[CommonModule,FormsModule,RouterLink,IonicModule],templateUrl:'./account.page.html'})
 export class AccountPage{

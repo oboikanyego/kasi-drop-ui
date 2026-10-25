@@ -2,11 +2,11 @@ import {Component,inject,OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Router,RouterLink,ActivatedRoute} from '@angular/router';
-import {IonicModule} from '@ionic/angular';
+import { IonIcon } from '@ionic/angular/standalone';
 import {ApiService,Product,StoreService} from './store.service';
 import {ProductGridComponent} from './product-grid.component';
 
-@Component({standalone:true,imports:[CommonModule,FormsModule,RouterLink,ProductGridComponent,IonicModule],templateUrl:'./home.page.html'})
+@Component({standalone:true,imports:[CommonModule,FormsModule,RouterLink,ProductGridComponent,IonIcon],templateUrl:'./home.page.html'})
 export class HomePage implements OnInit {
  readonly api=inject(ApiService);
  readonly router=inject(Router);
@@ -25,7 +25,7 @@ export class HomePage implements OnInit {
  searchNow(){this.router.navigate(['/shop'],{queryParams:this.searchTerm.trim()?{q:this.searchTerm.trim()}: {}});}
 }
 
-@Component({standalone:true,imports:[CommonModule,RouterLink,ProductGridComponent,FormsModule,IonicModule],templateUrl:'./shop.page.html'})
+@Component({standalone:true,imports:[CommonModule,RouterLink,ProductGridComponent,FormsModule,IonIcon],templateUrl:'./shop.page.html'})
 export class ShopPage implements OnInit {
  readonly api=inject(ApiService);
  readonly route=inject(ActivatedRoute);
@@ -53,7 +53,7 @@ export class ShopPage implements OnInit {
  setCategory(c:string){this.category=c;this.load();}
 }
 
-@Component({standalone:true,imports:[CommonModule,RouterLink,ProductGridComponent,IonicModule],templateUrl:'./product.page.html'})
+@Component({standalone:true,imports:[CommonModule,RouterLink,ProductGridComponent,IonIcon],templateUrl:'./product.page.html'})
 export class ProductPage implements OnInit {
  readonly api=inject(ApiService);
  readonly store=inject(StoreService);
@@ -82,7 +82,7 @@ export class ProductPage implements OnInit {
  }
 }
 
-@Component({standalone:true,imports:[CommonModule,RouterLink,ProductGridComponent,IonicModule],templateUrl:'./favorites.page.html'})
+@Component({standalone:true,imports:[CommonModule,RouterLink,ProductGridComponent,IonIcon],templateUrl:'./favorites.page.html'})
 export class FavoritesPage implements OnInit {
  readonly api=inject(ApiService);
  readonly store=inject(StoreService);

@@ -1,9 +1,9 @@
 import {Component,Input,inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterLink} from '@angular/router';
-import {IonicModule} from '@ionic/angular';
+import { IonIcon } from '@ionic/angular/standalone';
 import {Product,StoreService} from './store.service';
-@Component({selector:'app-product-grid',standalone:true,imports:[CommonModule,RouterLink,IonicModule],templateUrl:'./product-grid.component.html'})
+@Component({selector:'app-product-grid',standalone:true,imports:[CommonModule,RouterLink,IonIcon],templateUrl:'./product-grid.component.html'})
 export class ProductGridComponent{
  @Input({required:true})products:Product[]=[];
  store=inject(StoreService);
