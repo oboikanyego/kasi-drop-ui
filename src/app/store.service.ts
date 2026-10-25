@@ -4,6 +4,20 @@ import {catchError,of,tap,throwError,timeout} from 'rxjs';
 import {previewProducts,searchPreview} from './preview-catalogue';
 export type Product={id:string;name:string;description:string;category:string;price:number;stock:number;image:string;tags:string[];featured:boolean;active:boolean};
 export type CartLine={product:Product;quantity:number};
+
+export type AddressLabel='Home'|'Work'|'Other';
+export type SavedAddress={
+ id:string;label:AddressLabel;nickname:string;recipientName:string;phone:string;
+ street:string;unit:string;suburb:string;city:string;province:string;postalCode:string;
+ deliveryNotes:string;isDefault:boolean;
+};
+export type AddressInput=Omit<SavedAddress,'id'>;
+export type CustomerProfile={
+ id:string;name:string;email:string;role:'customer'|'admin';phone:string;about:string;
+ preferredLanguage:string;marketingOptIn:boolean;memberSince:string|null;
+ avatarUpdatedAt:string|null;addresses:SavedAddress[];
+};
+export type ProfileUpdate=Pick<CustomerProfile,'name'|'phone'|'about'|'preferredLanguage'|'marketingOptIn'>;
 export type User={id:string;name:string;email:string;role:'customer'|'admin'};
 export type Order={id:string;items:{productId:string;name:string;price:number;quantity:number;image:string}[];total:number;subtotal:number;shipping:number;status:string;createdAt:string;demoSeed?:boolean;delivery:{name:string;address:string;city:string}};
 export const authInterceptor:HttpInterceptorFn=(req,next)=>{
@@ -43,6 +57,11 @@ export class StoreService{
  toggleSelected(id:string){this.selectedIds.update(ids=>ids.includes(id)?ids.filter(x=>x!==id):[...ids,id]);this.persist();}
  selectAll(enabled:boolean){this.selectedIds.set(enabled?this.cart().map(x=>x.product.id):[]);this.persist();}
  login(token:string,user:User){localStorage.setItem('kasi_token',token);localStorage.setItem('kasi_user',JSON.stringify(user));this.user.set(user);}
+ updateAccountName(name:string){
+  const user=this.user();if(!user)return;
+  const updated={...user,name};
+  this.user.set(updated);localStorage.setItem('kasi_user',JSON.stringify(updated));
+ }
  logout(){localStorage.removeItem('kasi_token');localStorage.removeItem('kasi_user');this.user.set(null);}
  notify(message:string){this.toast.set(message);setTimeout(()=>{if(this.toast()===message)this.toast.set('')},3000);}
  private persist(){localStorage.setItem('kasi_cart',JSON.stringify(this.cart()));localStorage.setItem('kasi_selected',JSON.stringify(this.selectedIds()));}
@@ -81,6 +100,17 @@ export class ApiService{
    })
   );
  }
+
+ getProfile(){return this.http.get<{profile:CustomerProfile}>(this.base+'/profile');}
+ saveProfile(payload:ProfileUpdate){return this.http.patch<{profile:CustomerProfile}>(this.base+'/profile',payload);}
+ getAddresses(){return this.http.get<{addresses:SavedAddress[]}>(this.base+'/profile/addresses');}
+ createAddress(payload:AddressInput){return this.http.post<{addresses:SavedAddress[]}>(this.base+'/profile/addresses',payload);}
+ updateAddress(id:string,payload:AddressInput){return this.http.put<{addresses:SavedAddress[]}>(this.base+'/profile/addresses/'+encodeURIComponent(id),payload);}
+ selectDefaultAddress(id:string){return this.http.patch<{addresses:SavedAddress[]}>(this.base+'/profile/addresses/'+encodeURIComponent(id)+'/default',{});}
+ deleteAddress(id:string){return this.http.delete<{addresses:SavedAddress[]}>(this.base+'/profile/addresses/'+encodeURIComponent(id));}
+ loadAvatar(){return this.http.get(this.base+'/profile/avatar',{responseType:'blob'});}
+ uploadAvatar(photo:Blob){return this.http.put<{avatarUpdatedAt:string}>(this.base+'/profile/avatar',photo,{headers:{'Content-Type':photo.type}});}
+ removeAvatar(){return this.http.delete(this.base+'/profile/avatar');}
  meta(){return this.http.get<{categories:string[];demoMode:boolean;aiEnabled:boolean;checkoutEnabled:boolean}>(this.base+'/meta');}
  login(body:{email:string;password:string}){return this.http.post<{user:User;token:string}>(this.base+'/auth/login',body);}
  register(body:{name:string;email:string;password:string}){return this.http.post<{user:User;token:string}>(this.base+'/auth/register',body);}

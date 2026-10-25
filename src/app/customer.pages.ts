@@ -4,33 +4,50 @@ import {FormsModule} from '@angular/forms';
 import {Router,RouterLink} from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { IonIcon } from '@ionic/angular/standalone';
-import {ApiService,StoreService,Order} from './store.service';
+import {ApiService,StoreService,type SavedAddress} from './store.service';
 @Component({standalone:true,imports:[CommonModule,FormsModule,RouterLink,IonIcon],templateUrl:'./cart.page.html'})
 export class CartPage{store=inject(StoreService);api=inject(ApiService);}
-@Component({standalone:true,imports:[CommonModule,FormsModule,RouterLink,IonicModule],templateUrl:'./account.page.html'})
-export class AccountPage implements OnInit {
- store=inject(StoreService);api=inject(ApiService);router=inject(Router);
- demoLoginAvailable=false;
- ngOnInit(){this.api.meta().subscribe({
-  next:meta=>{this.demoLoginAvailable=meta.demoMode;},
-  error:()=>{this.demoLoginAvailable=false;}
- });}
- registerMode=false;busy=false;error='';name='';email='';password='';
- submit(){
-  if(this.busy)return;this.busy=true;this.error='';
-  const request=this.registerMode?this.api.register({name:this.name,email:this.email,password:this.password}):this.api.login({email:this.email,password:this.password});
-  request.subscribe({next:r=>{this.store.login(r.token,r.user);this.busy=false;this.router.navigateByUrl(r.user.role==='admin'?'/admin':'/orders');},
-   error:e=>{this.error=e.error?.error||'Could not sign in. Please check your details.';this.busy=false;}});
- }
- logout(){this.store.logout();this.store.notify('Signed out');}
- fillDemo(role:'admin'|'shopper'){if(!this.demoLoginAvailable)return;this.email=role==='admin'?'admin@kasidrop.test':'shopper@kasidrop.test';this.password='Demo@12345';this.registerMode=false;}
-}
-@Component({standalone:true,imports:[CommonModule,FormsModule,RouterLink,IonicModule],templateUrl:'./checkout.page.html'})
+@Component({standalone:true,imports:[CommonModule,FormsModule,RouterLink,IonicModule],templateUrl:'./checkout.page.html',styleUrls:['./profile-page.scss']})
 export class CheckoutPage implements OnInit{
  api=inject(ApiService);store=inject(StoreService);router=inject(Router);
  delivery={name:'',phone:'',address:'',city:'',province:'Gauteng',postalCode:''};
+ savedAddresses:SavedAddress[]=[];
+ selectedAddressId='manual';
+ profileName='';profilePhone='';
+ addressLoading=false;
  method:'demo'|'payfast'='demo';demo=true;busy=false;error='';
- ngOnInit(){this.api.meta().subscribe({next:m=>{this.demo=m.demoMode;this.method=m.demoMode?'demo':'payfast';},error:()=>this.error='Checkout service is unavailable.'});}
+ ngOnInit(){
+  this.api.meta().subscribe({next:m=>{
+   this.demo=m.demoMode;this.method=m.demoMode?'demo':'payfast';
+  },error:()=>this.error='Checkout service is unavailable.'});
+  if(this.store.user()){
+   this.addressLoading=true;
+   this.api.getProfile().subscribe({
+    next:({profile})=>{
+     this.savedAddresses=profile.addresses;
+     this.profileName=profile.name;this.profilePhone=profile.phone;
+     const preferred=profile.addresses.find(a=>a.isDefault);
+     this.selectedAddressId=preferred?.id||'manual';
+     this.onAddressSelected();
+     this.addressLoading=false;
+    },
+    error:()=>{this.addressLoading=false;this.delivery.name=this.store.user()?.name||'';}
+   });
+  }
+ }
+ onAddressSelected(){
+  const found=this.savedAddresses.find(address=>address.id===this.selectedAddressId);
+  if(!found){
+   this.delivery={name:this.profileName||this.store.user()?.name||'',phone:this.profilePhone,
+    address:'',city:'',province:'Gauteng',postalCode:''};
+   return;
+  }
+  this.delivery={
+   name:found.recipientName,phone:found.phone,
+   address:found.unit?found.unit+', '+found.street:found.street,
+   city:found.city,province:found.province,postalCode:found.postalCode
+  };
+ }
  submit(){
   if(this.api.previewMode()){this.error='Checkout is disabled while the catalogue is in offline preview mode.';return;}
   if(this.busy||!this.store.selectedCart().length||!this.store.user())return;

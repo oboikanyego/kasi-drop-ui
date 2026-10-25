@@ -1,6 +1,7 @@
 import {Routes} from '@angular/router';
 import {HomePage,ShopPage,ProductPage,FavoritesPage} from './shop.pages';
-import {CartPage,CheckoutPage,OrdersPage,AccountPage} from './customer.pages';
+import {CartPage,CheckoutPage,OrdersPage} from './customer.pages';
+import {AccountPage} from './profile.page';
 import {AdminPage} from './admin.page';
 export const routes:Routes=[
  {path:'',component:HomePage,title:'KasiDrop | Local roots. Delivered.'},
