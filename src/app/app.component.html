@@ -55,7 +55,24 @@
     <button type="button" (click)="chatOpen.set(false)" aria-label="Close assistant"><ion-icon name="close-outline"></ion-icon></button>
    </div>
    <div class="assistant-thread" role="log" aria-live="polite">
-    <p *ngFor="let message of chatMessages()" [class.sent]="message.from==='user'">{{message.text}}</p>
+    <div class="assistant-message" *ngFor="let message of chatMessages()" [class.sent]="message.from==='user'">
+     <p>{{message.text}}</p>
+     <div class="assistant-suggestions" *ngIf="message.products?.length" aria-label="Suggested products">
+      <article class="assistant-product" *ngFor="let product of message.products">
+       <a [routerLink]="['/product',product.id]" (click)="chatOpen.set(false)" [attr.aria-label]="'View '+product.name">
+        <img [src]="product.image" [alt]="product.name" loading="lazy" (error)="onSuggestedImageError($event)">
+       </a>
+       <div class="assistant-product-details">
+        <a [routerLink]="['/product',product.id]" (click)="chatOpen.set(false)" class="assistant-product-name">{{product.name}}</a>
+        <strong>{{product.price | currency:'ZAR':'symbol-narrow':'1.2-2'}}</strong>
+        <small [class.out-of-stock]="product.stock<1">{{product.stock>0?'In stock':'Out of stock'}}</small>
+       </div>
+       <button type="button" class="assistant-add" (click)="addSuggestedProduct(product)" [disabled]="!product.active||product.stock<1" [attr.aria-label]="'Add '+product.name+' to cart'">
+        <ion-icon name="add-outline"></ion-icon>
+       </button>
+      </article>
+     </div>
+    </div>
     <p *ngIf="thinking()">Checking local products…</p>
    </div>
    <form class="assistant-compose" (ngSubmit)="sendChat()">
