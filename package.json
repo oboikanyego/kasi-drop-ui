@@ -6,8 +6,8 @@
     "start": "ng serve --host 0.0.0.0",
     "build": "ng build --configuration production",
     "test": "node --test tests/*.test.mjs",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format": "npx --yes prettier@3.6.2 --write .",
+    "format:check": "npx --yes prettier@3.6.2 --check ."
   },
   "dependencies": {
     "@angular/animations": "^20.3.0",
@@ -27,7 +27,6 @@
     "@angular-devkit/build-angular": "^20.3.0",
     "@angular/cli": "^20.3.0",
     "@angular/compiler-cli": "^20.3.0",
-    "typescript": "~5.9.2",
-    "prettier": "3.6.2"
+    "typescript": "~5.9.2"
   }
 }
