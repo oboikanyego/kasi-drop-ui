@@ -338,6 +338,8 @@ export class StoreService {
     localStorage.setItem('kasi_selected', JSON.stringify(this.selectedIds()));
   }
 }
+/** The API answers chat within 12s (falling back to catalogue search); this adds room for the network. */
+export const chatTimeoutMs = 20_000;
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private http = inject(HttpClient);
@@ -491,12 +493,14 @@ export class ApiService {
     );
   }
   chat(message: string) {
-    return this.http.post<{
-      reply: string;
-      products: Product[];
-      cartActions: { productId: string; quantity: number }[];
-      mode: string;
-    }>(this.base + '/ai/chat', { message });
+    return this.http
+      .post<{
+        reply: string;
+        products: Product[];
+        cartActions: { productId: string; quantity: number }[];
+        mode: string;
+      }>(this.base + '/ai/chat', { message })
+      .pipe(timeout(chatTimeoutMs));
   }
   draftListing(body: { name: string; notes: string; category: string }) {
     return this.http.post<{ draft: { title: string; description: string; tags: string[] } }>(

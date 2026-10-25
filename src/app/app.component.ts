@@ -71,12 +71,15 @@ export class AppComponent {
         }
         this.thinking.set(false);
       },
-      error: () => {
+      error: (error) => {
         this.chatMessages.update((items) => [
           ...items,
           {
             from: 'bot',
-            text: 'I cannot connect right now. The catalogue is still open for browsing.',
+            text:
+              error?.name === 'TimeoutError'
+                ? 'Kasi AI is taking too long to answer. Please try again in a moment — the catalogue is still open for browsing.'
+                : 'I cannot connect right now. The catalogue is still open for browsing.',
           },
         ]);
         this.thinking.set(false);
