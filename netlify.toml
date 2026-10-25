@@ -4,7 +4,7 @@
 
 [[redirects]]
   from = "/api/*"
-  to = "https://kasi-drop-api.onrender.com/api/:splat"
+  to = "https://kasi-drop-api-9rdp.onrender.com/api/:splat"
   status = 200
   force = true
 
