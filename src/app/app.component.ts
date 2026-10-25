@@ -9,7 +9,7 @@ import {ApiService,StoreService} from './store.service';
 
 addIcons({homeOutline,home,gridOutline,grid,bagHandleOutline,bagHandle,heartOutline,heart,personCircleOutline,personCircle,searchOutline,arrowForwardOutline,chevronForwardOutline,chevronBackOutline,locationOutline,notificationsOutline,giftOutline,flameOutline,leafOutline,cafeOutline,shirtOutline,colorPaletteOutline,cubeOutline,arrowBackOutline,shareOutline,addOutline,removeOutline,ellipsisHorizontalOutline,trashOutline,checkmarkOutline,sparklesOutline,closeOutline,sendOutline,logOutOutline,personOutline,storefrontOutline,optionsOutline,checkmarkCircleOutline,menuOutline});
 
-@Component({selector:'app-root',standalone:true,imports:[CommonModule,FormsModule,RouterLink,RouterLinkActive,RouterOutlet,IonicModule],templateUrl:'./app.component.html'})
+@Component({selector:'app-root',standalone:true,imports:[CommonModule,FormsModule,RouterLink,RouterLinkActive,RouterOutlet,IonicModule],templateUrl:'./app.component.html',styleUrls:['./preview-status.scss']})
 export class AppComponent {
  readonly store=inject(StoreService);
  readonly api=inject(ApiService);

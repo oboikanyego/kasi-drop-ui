@@ -27,3 +27,10 @@ Netlify should import this GitHub repo with:
 - SPA redirects and API reverse proxy are defined in \`netlify.toml\`.
 
 **Status:** MVP code, not an audited production commerce site. Semantic vector embeddings are not yet implemented; catalogue search currently uses keyword/contextual synonyms. Real payments require further verification and security testing.
+
+
+## Backend connection and preview mode
+
+The storefront calls the real API through Netlify's \`/api/*\` proxy. If the API cannot be reached, **catalogue reads fall back to 12 clearly labelled static preview products** so the design can be explored. An on-screen banner warns that inventory/prices are examples and checkout is disabled. This is not a replacement for a deployed backend or payment verification.
+
+To enable accounts, stock, orders and checkout, deploy [kasi-drop-api](https://github.com/oboikanyego/kasi-drop-api) to Render, set its \`CLIENT_URL\` to this Netlify origin, and update \`netlify.toml\` to point at the **actual** Render URL. Verify \`GET /api/meta\` and \`GET /api/products\` return 200 through Netlify before accepting demo orders.

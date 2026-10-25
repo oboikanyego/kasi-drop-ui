@@ -1,0 +1,10 @@
+.preview-status{
+ display:flex;gap:10px;align-items:flex-start;
+ padding:12px max(20px,calc((100% - 1180px)/2));
+ background:#f3f8dc;border-bottom:1px solid #e0e8c2;
+ color:#4b5920;font:600 12px/1.5 'DM Sans',sans-serif;
+}
+.preview-status ion-icon{font-size:18px;flex:none;margin-top:1px}
+@media(max-width:700px){
+ .preview-status{padding:12px 16px;font-size:11px}
+}

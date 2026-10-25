@@ -22,8 +22,8 @@
     <div class="total-line"><span>Delivery</span><span>{{store.shipping()===0?'Free':(store.shipping() | currency:'ZAR':'symbol-narrow':'1.0-0')}}</span></div>
     <p *ngIf="store.subtotal()>0&&store.shipping()>0" class="delivery-tip">Add {{750-store.subtotal() | currency:'ZAR':'symbol-narrow':'1.0-0'}} more for free delivery.</p>
     <div class="grand-total"><span>Total</span><strong>{{store.total() | currency:'ZAR':'symbol-narrow':'1.0-0'}}</strong></div>
-    <a *ngIf="store.selectedCart().length;else noSelection" class="lime-button checkout-button" routerLink="/checkout">Checkout <ion-icon name="arrow-forward-outline"></ion-icon></a>
-    <ng-template #noSelection><button type="button" class="lime-button checkout-button" disabled>Select items to checkout</button></ng-template>
+    <a *ngIf="store.selectedCart().length&&!api.previewMode();else noSelection" class="lime-button checkout-button" routerLink="/checkout">Checkout <ion-icon name="arrow-forward-outline"></ion-icon></a>
+    <ng-template #noSelection><button type="button" class="lime-button checkout-button" disabled>{{api.previewMode()?'Checkout unavailable — preview mode':'Select items to checkout'}}</button></ng-template>
     <p class="demo-footnote">Demo payments only · All prices in ZAR</p>
    </aside>
   </div>

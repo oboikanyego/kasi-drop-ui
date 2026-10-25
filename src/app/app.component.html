@@ -20,6 +20,10 @@
    </div>
   </header>
 
+  <div *ngIf="api.previewMode()" class="preview-status" role="status">
+   <ion-icon name="information-circle-outline"></ion-icon>
+   <span>Catalogue preview: the shop API is currently unavailable. Product prices and stock are examples; checkout is disabled until the connection is restored.</span>
+  </div>
   <main class="main-content"><router-outlet></router-outlet></main>
 
   <footer class="desktop-footer">

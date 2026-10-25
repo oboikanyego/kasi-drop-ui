@@ -5,7 +5,7 @@ import {Router,RouterLink} from '@angular/router';
 import {IonicModule} from '@ionic/angular';
 import {ApiService,StoreService,Order} from './store.service';
 @Component({standalone:true,imports:[CommonModule,FormsModule,RouterLink,IonicModule],templateUrl:'./cart.page.html'})
-export class CartPage{store=inject(StoreService);}
+export class CartPage{store=inject(StoreService);api=inject(ApiService);}
 @Component({standalone:true,imports:[CommonModule,FormsModule,RouterLink,IonicModule],templateUrl:'./account.page.html'})
 export class AccountPage{
  store=inject(StoreService);api=inject(ApiService);router=inject(Router);
@@ -26,6 +26,7 @@ export class CheckoutPage implements OnInit{
  method:'demo'|'payfast'='demo';demo=true;busy=false;error='';
  ngOnInit(){this.api.meta().subscribe({next:m=>{this.demo=m.demoMode;this.method=m.demoMode?'demo':'payfast';},error:()=>this.error='Checkout service is unavailable.'});}
  submit(){
+  if(this.api.previewMode()){this.error='Checkout is disabled while the catalogue is in offline preview mode.';return;}
   if(this.busy||!this.store.selectedCart().length||!this.store.user())return;
   this.busy=true;this.error='';
   const items=this.store.selectedCart().map(l=>({productId:l.product.id,quantity:l.quantity}));

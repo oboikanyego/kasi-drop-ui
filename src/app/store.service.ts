@@ -1,5 +1,7 @@
 import {Injectable,computed,signal,inject} from '@angular/core';
 import {HttpClient,HttpInterceptorFn} from '@angular/common/http';
+import {catchError,of,tap,throwError,timeout} from 'rxjs';
+import {previewProducts,searchPreview} from './preview-catalogue';
 export type Product={id:string;name:string;description:string;category:string;price:number;stock:number;image:string;tags:string[];featured:boolean;active:boolean};
 export type CartLine={product:Product;quantity:number};
 export type User={id:string;name:string;email:string;role:'customer'|'admin'};
@@ -49,8 +51,36 @@ export class StoreService{
 export class ApiService{
  private http=inject(HttpClient);
  private readonly base='/api';
- getProducts(query=''){return this.http.get<{products:Product[];total:number}>(this.base+'/products'+query);}
- getProduct(id:string){return this.http.get<{product:Product;similar:Product[]}>(this.base+'/products/'+encodeURIComponent(id));}
+ /** A failed API request switches catalogue browsing into explicitly marked read-only preview mode. */
+ readonly previewMode=signal(false);
+ private isUnavailable(error:any):boolean{
+  return error?.name==='TimeoutError'||[0,502,503,504,404].includes(error?.status);
+ }
+ getProducts(query=''){
+  return this.http.get<{products:Product[];total:number}>(this.base+'/products'+query).pipe(
+   timeout(12000),
+   tap(()=>this.previewMode.set(false)),
+   catchError(err=>{
+    if(!this.isUnavailable(err))return throwError(()=>err);
+    this.previewMode.set(true);
+    const products=searchPreview(query);
+    return of({products,total:products.length});
+   })
+  );
+ }
+ getProduct(id:string){
+  return this.http.get<{product:Product;similar:Product[]}>(this.base+'/products/'+encodeURIComponent(id)).pipe(
+   timeout(12000),
+   tap(()=>this.previewMode.set(false)),
+   catchError(err=>{
+    if(!this.isUnavailable(err))return throwError(()=>err);
+    const product=previewProducts.find(p=>p.id===id);
+    if(!product)return throwError(()=>err);
+    this.previewMode.set(true);
+    return of({product,similar:previewProducts.filter(p=>p.id!==id&&p.category===product.category).slice(0,4)});
+   })
+  );
+ }
  meta(){return this.http.get<{categories:string[];demoMode:boolean;aiEnabled:boolean;checkoutEnabled:boolean}>(this.base+'/meta');}
  login(body:{email:string;password:string}){return this.http.post<{user:User;token:string}>(this.base+'/auth/login',body);}
  register(body:{name:string;email:string;password:string}){return this.http.post<{user:User;token:string}>(this.base+'/auth/register',body);}
