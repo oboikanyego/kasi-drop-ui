@@ -12,8 +12,13 @@ export const authInterceptor:HttpInterceptorFn=(req,next)=>{
 export class StoreService{
  readonly cart=signal<CartLine[]>(this.restore<CartLine[]>('kasi_cart',[]));
  readonly user=signal<User|null>(this.restore<User|null>('kasi_user',null));
+ readonly favorites=signal<string[]>(this.restore<string[]>('kasi_favorites',[]));
+ readonly selectedIds=signal<string[]>(this.restore<string[]>('kasi_selected',this.cart().map(l=>l.product.id)));
+ readonly selectedCart=computed(()=>this.cart().filter(l=>this.selectedIds().includes(l.product.id)));
+ readonly allSelected=computed(()=>this.cart().length>0&&this.cart().every(l=>this.selectedIds().includes(l.product.id)));
+ readonly selectedCount=computed(()=>this.selectedCart().reduce((n,l)=>n+l.quantity,0));
  readonly count=computed(()=>this.cart().reduce((n,x)=>n+x.quantity,0));
- readonly subtotal=computed(()=>this.cart().reduce((n,x)=>n+x.product.price*x.quantity,0));
+ readonly subtotal=computed(()=>this.selectedCart().reduce((n,x)=>n+x.product.price*x.quantity,0));
  readonly shipping=computed(()=>this.subtotal()>=750||this.subtotal()===0?0:79);
  readonly total=computed(()=>this.subtotal()+this.shipping());
  toast=signal('');
@@ -23,15 +28,22 @@ export class StoreService{
   this.cart.update(lines=>{const found=lines.find(l=>l.product.id===product.id);
    if(found)return lines.map(l=>l.product.id===product.id?{...l,quantity:Math.min(l.quantity+quantity,product.stock,20)}:l);
    return [...lines,{product,quantity:Math.min(quantity,product.stock,20)}];});
+  this.selectedIds.update(ids=>ids.includes(product.id)?ids:[...ids,product.id]);
   this.persist();this.notify(product.name+' added to your bag');
  }
  update(id:string,quantity:number){this.cart.update(lines=>lines.map(l=>l.product.id===id?{...l,quantity:Math.max(1,Math.min(quantity,l.product.stock,20))}:l));this.persist();}
- remove(id:string){this.cart.update(lines=>lines.filter(l=>l.product.id!==id));this.persist();}
- clear(){this.cart.set([]);this.persist();}
+ remove(id:string){this.cart.update(lines=>lines.filter(l=>l.product.id!==id));this.selectedIds.update(ids=>ids.filter(x=>x!==id));this.persist();}
+ clear(){this.cart.set([]);this.selectedIds.set([]);this.persist();}
+ clearSelected(){const selected=new Set(this.selectedIds());this.cart.update(lines=>lines.filter(l=>!selected.has(l.product.id)));this.selectedIds.set([]);this.persist();}
+ isFavorite(id:string){return this.favorites().includes(id);}
+ toggleFavorite(id:string){this.favorites.update(ids=>ids.includes(id)?ids.filter(x=>x!==id):[...ids,id]);localStorage.setItem('kasi_favorites',JSON.stringify(this.favorites()));this.notify(this.isFavorite(id)?'Saved to favourites':'Removed from favourites');}
+ isSelected(id:string){return this.selectedIds().includes(id);}
+ toggleSelected(id:string){this.selectedIds.update(ids=>ids.includes(id)?ids.filter(x=>x!==id):[...ids,id]);this.persist();}
+ selectAll(enabled:boolean){this.selectedIds.set(enabled?this.cart().map(x=>x.product.id):[]);this.persist();}
  login(token:string,user:User){localStorage.setItem('kasi_token',token);localStorage.setItem('kasi_user',JSON.stringify(user));this.user.set(user);}
  logout(){localStorage.removeItem('kasi_token');localStorage.removeItem('kasi_user');this.user.set(null);}
  notify(message:string){this.toast.set(message);setTimeout(()=>{if(this.toast()===message)this.toast.set('')},3000);}
- private persist(){localStorage.setItem('kasi_cart',JSON.stringify(this.cart()));}
+ private persist(){localStorage.setItem('kasi_cart',JSON.stringify(this.cart()));localStorage.setItem('kasi_selected',JSON.stringify(this.selectedIds()));}
 }
 @Injectable({providedIn:'root'})
 export class ApiService{

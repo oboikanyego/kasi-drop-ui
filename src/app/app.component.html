@@ -1,34 +1,64 @@
 <ion-app>
  <ion-content [fullscreen]="true">
-  <div class="announcement">🇿🇦 PROUDLY LOCAL • FREE DELIVERY ON ORDERS OVER R750</div>
-  <header class="site-header">
-   <div class="header-inner">
-    <a class="brand" routerLink="/" aria-label="KasiDrop home"><span class="brand-mark">K<span>.</span></span><span>Kasi<span>Drop</span><small>LOCAL ROOTS. DELIVERED.</small></span></a>
-    <nav class="desktop-nav" aria-label="Main navigation"><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Home</a><a routerLink="/shop" routerLinkActive="active">Shop all</a><a routerLink="/shop" [queryParams]="{category:'Food & Drink'}">Food & drink</a><a routerLink="/shop" [queryParams]="{category:'Fashion'}">Fashion</a><a routerLink="/shop" [queryParams]="{category:'Crafts'}">Crafts</a></nav>
-    <div class="header-actions">
-     <form class="header-search" (ngSubmit)="searchNow()"><input [(ngModel)]="search" name="q" placeholder="What are you looking for?" aria-label="Search products"><button type="submit" aria-label="Search">⌕</button></form>
-     <a class="head-link user-shortcut" routerLink="/account" [attr.aria-label]="store.user()?'My account':'Sign in'">◯</a>
-     <a class="head-link cart-shortcut" routerLink="/cart" aria-label="Shopping bag">♧<span *ngIf="store.count()">{{store.count()}}</span></a>
+  <header class="desktop-header">
+   <div class="shell desktop-header-inner">
+    <a routerLink="/" class="identity" aria-label="KasiDrop home">
+     <span class="identity-icon"><ion-icon name="sparkles-outline"></ion-icon></span>
+     <span class="identity-name">kasi<span>drop</span><small>MADE HERE. LOVED EVERYWHERE.</small></span>
+    </a>
+    <nav class="desktop-links" aria-label="Primary navigation">
+     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Home</a>
+     <a routerLink="/shop" routerLinkActive="active">Catalogue</a>
+     <a routerLink="/favorites" routerLinkActive="active">Favourites</a>
+     <a routerLink="/orders" routerLinkActive="active">My orders</a>
+    </nav>
+    <div class="desktop-actions">
+     <form class="search-field" (ngSubmit)="searchNow()"><ion-icon name="search-outline"></ion-icon><input name="search" [(ngModel)]="search" placeholder="Search local goods" aria-label="Search local goods"></form>
+     <a routerLink="/account" class="icon-button" aria-label="Account"><ion-icon name="person-circle-outline"></ion-icon></a>
+     <a routerLink="/cart" class="icon-button with-count" aria-label="Shopping cart"><ion-icon name="bag-handle-outline"></ion-icon><span class="counter" *ngIf="store.count()">{{store.count()}}</span></a>
     </div>
    </div>
   </header>
-  <main><router-outlet></router-outlet></main>
-  <footer class="site-footer">
-   <div class="container footer-grid">
-    <div><a class="brand footer-brand" routerLink="/"><span class="brand-mark">K<span>.</span></span><span>Kasi<span>Drop</span></span></a><p>Made here. Loved everywhere.<br>Celebrating the best of South African creativity, culture and craft.</p></div>
-    <div><h4>Explore</h4><a routerLink="/shop">Shop all</a><a routerLink="/shop" [queryParams]="{category:'Fashion'}">Fashion</a><a routerLink="/shop" [queryParams]="{category:'Food & Drink'}">Food & Drink</a></div>
-    <div><h4>Need help?</h4><a routerLink="/account">My account</a><a routerLink="/orders">Track an order</a><a routerLink="/cart">Shopping bag</a></div>
-    <div><h4>Built for Mzansi</h4><p>Shopping in rands, backed by secure checkout. Our demo uses simulated payments only.</p><span class="flag">🇿🇦 Proudly South African</span></div>
+
+  <main class="main-content"><router-outlet></router-outlet></main>
+
+  <footer class="desktop-footer">
+   <div class="shell footer-inner">
+    <div><strong>kasidrop<span>.</span></strong><p>Local roots. Delivered. Discover South African makers, flavours and fresh everyday finds.</p></div>
+    <nav aria-label="Footer links"><a routerLink="/shop">Shop</a><a routerLink="/favorites">Saved items</a><a routerLink="/orders">Your orders</a><a routerLink="/account">Account</a></nav>
+    <small>© KasiDrop 2026 · Prices in ZAR · Demo checkout</small>
    </div>
-   <div class="container footer-bottom"><span>© 2026 KasiDrop. Made with love in Mzansi.</span><span>Payments in ZAR · Demo storefront</span></div>
   </footer>
-  <nav class="mobile-nav" aria-label="Mobile navigation"><a routerLink="/">⌂<small>Home</small></a><a routerLink="/shop">▦<small>Shop</small></a><a routerLink="/cart">♧<small>Bag ({{store.count()}})</small></a><a routerLink="/account">◯<small>Account</small></a></nav>
-  <div class="toast-alert" *ngIf="store.toast()">{{store.toast()}}</div>
-  <button class="assistant-toggle" aria-label="Chat with shopping assistant" (click)="chatOpen.set(!chatOpen())">{{chatOpen()?'×':'✦'}} <span *ngIf="!chatOpen()">Ask Kasi AI</span></button>
-  <section class="assistant" *ngIf="chatOpen()" aria-label="KasiDrop assistant">
-   <div class="assistant-head"><div><strong>✦ Kasi AI</strong><small>Your personal local shopping helper</small></div><button (click)="chatOpen.set(false)" aria-label="Close assistant">×</button></div>
-   <div class="assistant-messages"><p *ngFor="let m of chatMessages()" [class.mine]="m.from==='user'">{{m.text}}</p><p *ngIf="thinking()">Finding something lekker…</p></div>
-   <form (ngSubmit)="sendChat()"><input [(ngModel)]="chatText" name="message" placeholder="Gift under R500 for a braai fan…" maxlength="400" aria-label="Ask shopping assistant"><button type="submit" [disabled]="thinking()">➤</button></form>
+
+  <nav class="mobile-tabbar" aria-label="Bottom navigation">
+   <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{exact:true}"><ion-icon name="home-outline"></ion-icon><span>Home</span></a>
+   <a routerLink="/shop" routerLinkActive="is-active"><ion-icon name="grid-outline"></ion-icon><span>Catalog</span></a>
+   <a routerLink="/cart" routerLinkActive="is-active" class="bag-tab">
+    <span class="nav-icon-wrap"><ion-icon name="bag-handle-outline"></ion-icon><b *ngIf="store.count()">{{store.count()}}</b></span><span>Cart</span>
+   </a>
+   <a routerLink="/favorites" routerLinkActive="is-active"><ion-icon name="heart-outline"></ion-icon><span>Favorites</span></a>
+   <a routerLink="/account" routerLinkActive="is-active"><ion-icon name="person-circle-outline"></ion-icon><span>Profile</span></a>
+  </nav>
+
+  <div class="app-toast" role="status" aria-live="polite" *ngIf="store.toast()">{{store.toast()}}</div>
+
+  <button class="ai-fab" type="button" (click)="chatOpen.set(!chatOpen())" [attr.aria-label]="chatOpen()?'Close shopping assistant':'Open shopping assistant'">
+   <ion-icon [name]="chatOpen()?'close-outline':'sparkles-outline'"></ion-icon><span *ngIf="!chatOpen()">Ask Kasi AI</span>
+  </button>
+  <section class="assistant-panel" *ngIf="chatOpen()" aria-label="KasiDrop AI shopping assistant">
+   <div class="assistant-top">
+    <div class="assistant-avatar"><ion-icon name="sparkles-outline"></ion-icon></div>
+    <div><strong>Kasi AI</strong><small>Your local shopping helper</small></div>
+    <button type="button" (click)="chatOpen.set(false)" aria-label="Close assistant"><ion-icon name="close-outline"></ion-icon></button>
+   </div>
+   <div class="assistant-thread" role="log" aria-live="polite">
+    <p *ngFor="let message of chatMessages()" [class.sent]="message.from==='user'">{{message.text}}</p>
+    <p *ngIf="thinking()">Checking local products…</p>
+   </div>
+   <form class="assistant-compose" (ngSubmit)="sendChat()">
+    <input name="message" [(ngModel)]="chatText" maxlength="400" placeholder="A gift under R500…" aria-label="Message Kasi AI">
+    <button type="submit" [disabled]="thinking()||!chatText.trim()" aria-label="Send message"><ion-icon name="send-outline"></ion-icon></button>
+   </form>
   </section>
  </ion-content>
 </ion-app>

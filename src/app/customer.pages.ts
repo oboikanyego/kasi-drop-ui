@@ -26,15 +26,15 @@ export class CheckoutPage implements OnInit{
  method:'demo'|'payfast'='demo';demo=true;busy=false;error='';
  ngOnInit(){this.api.meta().subscribe({next:m=>{this.demo=m.demoMode;this.method=m.demoMode?'demo':'payfast';},error:()=>this.error='Checkout service is unavailable.'});}
  submit(){
-  if(this.busy||!this.store.cart().length||!this.store.user())return;
+  if(this.busy||!this.store.selectedCart().length||!this.store.user())return;
   this.busy=true;this.error='';
-  const items=this.store.cart().map(l=>({productId:l.product.id,quantity:l.quantity}));
+  const items=this.store.selectedCart().map(l=>({productId:l.product.id,quantity:l.quantity}));
   this.api.checkout({items,paymentMethod:this.method,delivery:this.delivery}).subscribe({
    next:r=>{
     if(r.payment){const form=document.createElement('form');form.action=r.payment.url;form.method='POST';
      for(const [name,value] of Object.entries(r.payment.fields)){const field=document.createElement('input');field.type='hidden';field.name=name;field.value=value;form.appendChild(field);}
      document.body.appendChild(form);form.submit();return;}
-    this.store.clear();this.store.notify(r.warning||'Your order has been placed!');this.router.navigateByUrl('/orders');this.busy=false;
+    this.store.clearSelected();this.store.notify(r.warning||'Your order has been placed!');this.router.navigateByUrl('/orders');this.busy=false;
    },error:e=>{this.error=e.error?.error||'Could not process checkout. Please retry.';this.busy=false;}
   });
  }
