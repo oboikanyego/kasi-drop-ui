@@ -92,12 +92,10 @@ export class AccountPage implements OnInit, OnDestroy {
   addressError = '';
 
   ngOnInit() {
-    this.api
-      .meta()
-      .subscribe({
-        next: (meta) => (this.demoLoginAvailable = meta.demoMode),
-        error: () => (this.demoLoginAvailable = false),
-      });
+    this.api.meta().subscribe({
+      next: (meta) => (this.demoLoginAvailable = meta.demoMode),
+      error: () => (this.demoLoginAvailable = false),
+    });
     if (this.store.user()) this.loadProfile();
   }
   ngOnDestroy() {

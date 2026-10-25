@@ -45,12 +45,10 @@ export class AdminPage implements OnInit {
     if (this.store.user()?.role === 'admin') this.refresh();
   }
   refresh() {
-    this.api
-      .adminSummary()
-      .subscribe({
-        next: (r) => (this.summary = r),
-        error: () => (this.error = 'Could not load admin summary.'),
-      });
+    this.api.adminSummary().subscribe({
+      next: (r) => (this.summary = r),
+      error: () => (this.error = 'Could not load admin summary.'),
+    });
     this.api.getProducts().subscribe({ next: (r) => (this.products = r.products) });
     this.api.adminOrders().subscribe({ next: (r) => (this.orders = r.orders) });
   }
