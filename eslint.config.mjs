@@ -7,7 +7,10 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   { files: ['src/**/*.ts'], languageOptions: { globals: globals.browser } },
-  { files: ['tests/**/*.mjs', '*.mjs'], languageOptions: { globals: globals.node } },
+  {
+    files: ['tests/**/*.mjs', 'e2e/**/*.mjs', '*.mjs'],
+    languageOptions: { globals: globals.node },
+  },
   {
     rules: {
       // Unused parameters prefixed with _ are kept on purpose.

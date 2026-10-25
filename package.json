@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "test": "node --test tests/*.test.mjs",
     "format": "npx --yes prettier@3.6.2 --write .",
-    "format:check": "npx --yes prettier@3.6.2 --check ."
+    "format:check": "npx --yes prettier@3.6.2 --check .",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@angular/animations": "^20.3.0",
@@ -29,6 +30,7 @@
     "@angular/cli": "^20.3.0",
     "@angular/compiler-cli": "^20.3.0",
     "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.63.0",
     "eslint": "^9.39.5",
     "globals": "^16.5.0",
     "typescript": "~5.9.2",
