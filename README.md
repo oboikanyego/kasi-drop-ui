@@ -21,7 +21,7 @@ Demo customer \`shopper@kasidrop.test\` / \`Demo@12345\`; demo admin \`admin@kas
 
 ## Deployment
 Netlify should import this GitHub repo with:
-- Build: \`npm install && npm run build\`
+- Build: \`npm ci && npm run build\`
 - Publish directory: \`dist/kasi-drop-ui\`
 - Base directory: repository root
 - SPA redirects and API reverse proxy are defined in \`netlify.toml\`.
