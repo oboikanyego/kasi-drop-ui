@@ -71,10 +71,13 @@ export type Order = {
   demoSeed?: boolean;
   delivery: { name: string; address: string; city: string };
 };
-export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = typeof localStorage === 'undefined' ? '' : localStorage.getItem('kasi_token');
-  return next(token ? req.clone({ setHeaders: { Authorization: 'Bearer ' + token } }) : req);
-};
+/**
+ * The session lives in an httpOnly cookie the browser sends to /api by itself; scripts never see
+ * it. Requests that change data must carry this header, which another site cannot add.
+ */
+export const apiInterceptor: HttpInterceptorFn = (req, next) =>
+  next(req.url.startsWith('/api') ? req.clone({ setHeaders: { 'X-KasiDrop-CSRF': '1' } }) : req);
+
 @Injectable({ providedIn: 'root' })
 export class StoreService {
   readonly cart = signal<CartLine[]>(this.restore<CartLine[]>('kasi_cart', []));
@@ -86,8 +89,28 @@ export class StoreService {
   private favoritesQueue = Promise.resolve();
   private favoritesRevision = 0;
   constructor() {
-    if (this.user() && localStorage.getItem('kasi_token')) this.loadAccountFavorites();
+    this.restoreSession();
   }
+  /**
+   * Confirm the remembered user still has a live session cookie (any token an older UI left in
+   * localStorage was swapped for the cookie in main.ts). Only a 401 signs the user out; while
+   * offline the remembered user is kept.
+   */
+  private restoreSession() {
+    if (!this.user()) return;
+    firstValueFrom(this.favoritesApi.me()).then(
+      ({ user }) => {
+        if (this.user()?.id !== user.id) return;
+        this.user.set(user);
+        localStorage.setItem('kasi_user', JSON.stringify(user));
+        this.loadAccountFavorites();
+      },
+      (error) => {
+        if (error?.status === 401) this.endSession();
+      },
+    );
+  }
+
   readonly selectedIds = signal<string[]>(
     this.restore<string[]>(
       'kasi_selected',
@@ -306,8 +329,8 @@ export class StoreService {
     this.selectedIds.set(enabled ? this.cart().map((x) => x.product.id) : []);
     this.persist();
   }
-  login(token: string, user: User) {
-    localStorage.setItem('kasi_token', token);
+  /** Record who signed in; the API has already set the session cookie. */
+  login(user: User) {
     localStorage.setItem('kasi_user', JSON.stringify(user));
     this.user.set(user);
     this.syncGuestFavorites(user);
@@ -320,7 +343,12 @@ export class StoreService {
     localStorage.setItem('kasi_user', JSON.stringify(updated));
   }
   logout() {
-    localStorage.removeItem('kasi_token');
+    // The cookie is httpOnly, so only the API can clear it.
+    this.favoritesApi.logout().subscribe({ error: () => undefined });
+    this.endSession();
+  }
+  /** Forget the signed-in user in this browser. */
+  private endSession() {
     localStorage.removeItem('kasi_user');
     sessionStorage.removeItem('kasi_pending_checkout');
     this.user.set(null);
@@ -451,11 +479,18 @@ export class ApiService {
     }>(this.base + '/meta');
   }
   login(body: { email: string; password: string }) {
-    return this.http.post<{ user: User; token: string }>(this.base + '/auth/login', body);
+    return this.http.post<{ user: User }>(this.base + '/auth/login', body);
   }
   register(body: { name: string; email: string; password: string }) {
-    return this.http.post<{ user: User; token: string }>(this.base + '/auth/register', body);
+    return this.http.post<{ user: User }>(this.base + '/auth/register', body);
   }
+  me() {
+    return this.http.get<{ user: User }>(this.base + '/auth/me');
+  }
+  logout() {
+    return this.http.post<void>(this.base + '/auth/logout', {});
+  }
+
   checkout(payload: unknown) {
     return this.http.post<{
       order: Order;

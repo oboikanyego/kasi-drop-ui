@@ -9,6 +9,8 @@
 - Start the [KasiDrop API](https://github.com/oboikanyego/kasi-drop-api) on port 10000, or use the live Render deployment.
 - For local development use a proxy: \`npm start -- --proxy-config proxy.conf.json\`.
 
+Sign-in uses an httpOnly session cookie set by the API, so no token is ever stored in the browser or readable by page scripts. That relies on the app reaching the API at the same origin (the `/api` proxy). Requests carry an `X-KasiDrop-CSRF` header, which the API requires for cookie-authenticated changes. A token left in `localStorage` by an older release is swapped for the cookie on the next visit.
+
 The app calls the API at relative path \`/api\` so Netlify proxies requests via \`netlify.toml\`. Configure the Render service URL in that file if your assigned hostname differs. The UI needs the API for products, login and checkout.
 
 ## Checks
