@@ -342,3 +342,64 @@ ion-icon{vertical-align:middle}
  .cart-line{gap:9px}
  .catalogue-categories{margin-left:-12px;margin-right:-12px;padding:0 12px 5px}
 }
+
+
+/* Apply the same restrained retail language to secondary customer and admin journeys. */
+.btn-orange{background:var(--lime);color:#161a16;border-color:var(--lime)}
+.btn-orange:hover{background:var(--lime-dark);color:#161a16}
+.btn-outline{border-color:#dce2df;background:#fff;color:#262b28}
+.btn{border-radius:12px;box-shadow:none;transform:none!important}
+.page-banner{background:#f6f7f7;padding:46px 0 40px}
+.page-banner h1{font-family:'DM Sans',sans-serif;font-size:clamp(2rem,4vw,3.3rem);letter-spacing:-.055em}
+.page-banner h1 em{font-family:'DM Sans',sans-serif;font-style:normal;font-weight:800;color:#9fc500}
+.page-banner .eyebrow{color:#858f88}
+.page-banner p{font-size:13px;color:#8a948e}
+.auth-layout{padding-top:44px;min-height:600px}
+.auth-art{background:#f1f3f3;color:#222824;border-radius:21px}
+.auth-art h2{font-family:'DM Sans',sans-serif;font-size:clamp(2.5rem,4vw,4rem)}
+.auth-art h2 em{font-family:'DM Sans',sans-serif;font-style:normal;color:#91b900}
+.auth-art>p{color:#6d7670}
+.auth-card h1{font-size:32px;font-family:'DM Sans',sans-serif;letter-spacing:-.05em}
+.auth-card>p{color:#939a95}
+.auth-card input,.checkout-form input:not([type=radio]),.checkout-form select,.admin-editor input:not([type=checkbox]),.admin-editor textarea,.admin-editor select{background:#f7f8f8;border:1px solid #e9edeb;border-radius:11px;padding:14px;outline-color:#a6d600}
+.auth-card label,.checkout-form label,.admin-editor label{color:#4e5952}
+.switch-auth button{color:#6e9000}
+.demo-credentials{background:#f5f6f6;border:1px solid #ecefed;border-radius:13px}
+.demo-credentials button{border-color:#e6e9e6;border-radius:9px;font-weight:600}
+.checkout-form h2,.order-summary h2{font-family:'DM Sans',sans-serif}
+.order-summary{background:#f6f7f7;border-radius:17px;top:95px}
+.order-card{border:1px solid #e9ecea;border-radius:15px}
+.order-head h3{font-family:'DM Sans',sans-serif}
+.order-status{background:#eaf7cb;color:#3b5600}
+.admin-banner{background:#f5f6f6}
+.admin-tabs{border-bottom-color:#ecefed}
+.admin-tabs button.active{background:var(--lime);color:#151b13;border-radius:11px}
+.admin-tabs button{border-radius:11px}
+.stats-grid>div{background:#f5f6f7;border-radius:15px}
+.table-wrap{border-color:#e7ebe8;border-radius:14px}
+.table-wrap th{background:#f5f6f7}
+.table-wrap td{border-top-color:#eef0ef}
+.small-action{background:#f6f8f5;border:1px solid #e1e8dd;border-radius:8px;color:#394634}
+.admin-editor .ai-editor,.ai-editor{background:#f6f7f7;border:1px solid #e8ece9;border-radius:17px}
+.ai-editor .eyebrow{color:#688300}
+.success-msg{background:#eef9d6;color:#3c5804}
+@media(max-width:700px){
+ .page-banner{padding:29px 0}
+ .page-banner h1{font-size:29px}
+ .auth-layout{padding:20px 0 85px}
+ .auth-art{display:none}
+ .auth-card{padding:18px 0}
+ .auth-card h1{font-size:29px}
+ .checkout-layout,.cart-layout{display:block;padding:22px 0 90px}
+ .checkout-form{padding-bottom:15px}
+ .checkout-layout .order-summary{position:static;margin-top:20px}
+ .orders-wrap{padding:22px 0 85px}
+ .order-card{padding:18px}
+ .admin-wrap{padding:23px 0 90px}
+ .admin-tabs{overflow-x:auto;flex-wrap:nowrap;white-space:nowrap;scrollbar-width:none}
+ .stats-grid{grid-template-columns:repeat(2,1fr);gap:11px}
+ .stats-grid>div{padding:18px}
+ .stats-grid strong{font-size:25px}
+ .admin-editor{display:block}
+ .ai-editor{margin-top:24px}
+}
