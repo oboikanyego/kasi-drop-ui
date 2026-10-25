@@ -1,6 +1,6 @@
 import {Injectable,computed,signal,inject} from '@angular/core';
 import {HttpClient,HttpInterceptorFn} from '@angular/common/http';
-import {catchError,of,tap,throwError,timeout} from 'rxjs';
+import {catchError,firstValueFrom,of,tap,throwError,timeout} from 'rxjs';
 import {previewProducts,searchPreview} from './preview-catalogue';
 import {isApiUnavailable} from './api-availability';
 export type Product={id:string;name:string;description:string;category:string;price:number;stock:number;image:string;tags:string[];featured:boolean;active:boolean};
@@ -31,7 +31,11 @@ export const authInterceptor:HttpInterceptorFn=(req,next)=>{
 export class StoreService{
  readonly cart=signal<CartLine[]>(this.restore<CartLine[]>('kasi_cart',[]));
  readonly user=signal<User|null>(this.restore<User|null>('kasi_user',null));
- readonly favorites=signal<string[]>(this.restore<string[]>('kasi_favorites',[]));
+ readonly favorites=signal<string[]>(this.user()?[]:this.restore<string[]>('kasi_guest_favorites',[]));
+ private readonly favoritesApi=inject(ApiService);
+ private favoritesQueue=Promise.resolve();
+ private favoritesRevision=0;
+ constructor(){if(this.user()&&localStorage.getItem('kasi_token'))this.loadAccountFavorites();}
  readonly selectedIds=signal<string[]>(this.restore<string[]>('kasi_selected',this.cart().map(l=>l.product.id)));
  readonly selectedCart=computed(()=>this.cart().filter(l=>this.selectedIds().includes(l.product.id)));
  readonly allSelected=computed(()=>this.cart().length>0&&this.cart().every(l=>this.selectedIds().includes(l.product.id)));
@@ -86,17 +90,64 @@ export class StoreService{
   return true;
  }
  isFavorite(id:string){return this.favorites().includes(id);}
- toggleFavorite(id:string){this.favorites.update(ids=>ids.includes(id)?ids.filter(x=>x!==id):[...ids,id]);localStorage.setItem('kasi_favorites',JSON.stringify(this.favorites()));this.notify(this.isFavorite(id)?'Saved to favourites':'Removed from favourites');}
+ toggleFavorite(id:string){
+  const enabled=!this.isFavorite(id);
+  this.favorites.update(ids=>enabled?[...ids.filter(x=>x!==id),id]:ids.filter(x=>x!==id));
+  this.notify(enabled?'Saved to favourites':'Removed from favourites');
+  const user=this.user();
+  if(!user){localStorage.setItem('kasi_guest_favorites',JSON.stringify(this.favorites()));return;}
+  const revision=++this.favoritesRevision;
+  // Serialize saves to avoid responses from rapid taps overwriting newer changes.
+  this.favoritesQueue=this.favoritesQueue.then(async()=>{
+   if(this.user()?.id!==user.id)return;
+   try{
+    const result=await firstValueFrom(enabled?this.favoritesApi.addFavorite(id):this.favoritesApi.removeFavorite(id));
+    if(this.user()?.id===user.id&&this.favoritesRevision===revision)this.favorites.set(result.productIds);
+   }catch{
+    if(this.user()?.id===user.id&&this.favoritesRevision===revision){
+     this.notify('Could not sync favourites. Please try again.');
+     this.loadAccountFavorites();
+    }
+   }
+  });
+ }
+ private loadAccountFavorites(){
+  const user=this.user();if(!user)return;
+  const revision=++this.favoritesRevision;
+  this.favorites.set([]);
+  this.favoritesQueue=this.favoritesQueue.then(async()=>{
+   if(this.user()?.id!==user.id||revision!==this.favoritesRevision)return;
+   try{
+    const result=await firstValueFrom(this.favoritesApi.getFavorites());
+    if(this.user()?.id===user.id&&revision===this.favoritesRevision)this.favorites.set(result.productIds);
+   }catch{if(this.user()?.id===user.id&&revision===this.favoritesRevision)this.notify('Could not load saved favourites');}
+  });
+ }
+ private syncGuestFavorites(user:User){
+  const guestIds=this.restore<string[]>('kasi_guest_favorites',[]);
+  const revision=++this.favoritesRevision;
+  this.favorites.set([]);
+  this.favoritesQueue=this.favoritesQueue.then(async()=>{
+   if(this.user()?.id!==user.id||revision!==this.favoritesRevision)return;
+   try{
+    const result=await firstValueFrom(guestIds.length?this.favoritesApi.mergeFavorites(guestIds):this.favoritesApi.getFavorites());
+    if(this.user()?.id===user.id&&revision===this.favoritesRevision){
+     this.favorites.set(result.productIds);
+     if(guestIds.length){localStorage.removeItem('kasi_guest_favorites');}
+    }
+   }catch{if(this.user()?.id===user.id&&revision===this.favoritesRevision)this.notify('Favourites could not be synced. Retry after signing in.');}
+  });
+ }
  isSelected(id:string){return this.selectedIds().includes(id);}
  toggleSelected(id:string){this.selectedIds.update(ids=>ids.includes(id)?ids.filter(x=>x!==id):[...ids,id]);this.persist();}
  selectAll(enabled:boolean){this.selectedIds.set(enabled?this.cart().map(x=>x.product.id):[]);this.persist();}
- login(token:string,user:User){localStorage.setItem('kasi_token',token);localStorage.setItem('kasi_user',JSON.stringify(user));this.user.set(user);}
+ login(token:string,user:User){localStorage.setItem('kasi_token',token);localStorage.setItem('kasi_user',JSON.stringify(user));this.user.set(user);this.syncGuestFavorites(user);}
  updateAccountName(name:string){
   const user=this.user();if(!user)return;
   const updated={...user,name};
   this.user.set(updated);localStorage.setItem('kasi_user',JSON.stringify(updated));
  }
- logout(){localStorage.removeItem('kasi_token');localStorage.removeItem('kasi_user');sessionStorage.removeItem('kasi_pending_checkout');this.user.set(null);}
+ logout(){localStorage.removeItem('kasi_token');localStorage.removeItem('kasi_user');sessionStorage.removeItem('kasi_pending_checkout');this.user.set(null);this.favoritesRevision++;this.favorites.set(this.restore<string[]>('kasi_guest_favorites',[]));}
  notify(message:string){this.toast.set(message);setTimeout(()=>{if(this.toast()===message)this.toast.set('')},3000);}
  private persist(){localStorage.setItem('kasi_cart',JSON.stringify(this.cart()));localStorage.setItem('kasi_selected',JSON.stringify(this.selectedIds()));}
 }
@@ -132,6 +183,10 @@ export class ApiService{
   );
  }
 
+ getFavorites(){return this.http.get<{productIds:string[]}>(this.base+'/favorites');}
+ addFavorite(id:string){return this.http.put<{productIds:string[]}>(this.base+'/favorites/'+encodeURIComponent(id),{});}
+ removeFavorite(id:string){return this.http.delete<{productIds:string[]}>(this.base+'/favorites/'+encodeURIComponent(id));}
+ mergeFavorites(productIds:string[]){return this.http.post<{productIds:string[]}>(this.base+'/favorites/merge',{productIds});}
  getProfile(){return this.http.get<{profile:CustomerProfile}>(this.base+'/profile');}
  saveProfile(payload:ProfileUpdate){return this.http.patch<{profile:CustomerProfile}>(this.base+'/profile',payload);}
  getAddresses(){return this.http.get<{addresses:SavedAddress[]}>(this.base+'/profile/addresses');}
