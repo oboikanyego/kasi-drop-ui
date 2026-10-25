@@ -440,3 +440,8 @@ ion-icon{vertical-align:middle}
  .mobile-brand-lockup .kasi-wordmark-copy strong{font-size:24px}
  .mobile-brand-lockup .kasi-wordmark-copy small{font-size:5.5px}
 }
+
+/* Checkout return feedback: payment success is based on backend order state, never a URL parameter. */
+.payment-status-notice{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:20px 0;padding:14px 17px;background:#f4f8ed;border:1px solid #dae8c9;border-radius:12px;color:#40552d;font-size:13px;line-height:1.5}
+.payment-status-notice button{border:1px solid #bdd395;border-radius:9px;padding:8px 12px;background:#fff;color:#425f19;font-weight:700;white-space:nowrap;cursor:pointer}
+@media(max-width:640px){.payment-status-notice{flex-direction:column;align-items:start}}
