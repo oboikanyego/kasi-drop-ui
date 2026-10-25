@@ -7,7 +7,7 @@ import {ApiService,StoreService,Product,Order} from './store.service';
 @Component({standalone:true,imports:[CommonModule,FormsModule,RouterLink,IonicModule],templateUrl:'./admin.page.html'})
 export class AdminPage implements OnInit{
  api=inject(ApiService);store=inject(StoreService);
- tab:'overview'|'products'|'orders'|'add'='overview';summary?:{products:number;lowStock:number;orders:number;revenue:number;recentOrders:Order[]};
+ tab:'overview'|'products'|'orders'|'add'='overview';summary?:{products:number;lowStock:number;orders:number;demoOrders:number;revenue:number;simulatedRevenue:number;recentOrders:Order[]};
  products:Product[]=[];orders:Order[]=[];busy=false;error='';notice='';
  form={name:'',description:'',category:'Crafts',price:199,stock:10,image:'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=800',tags:'local, handmade',featured:false,active:true};
  notes='';generating=false;
