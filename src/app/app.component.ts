@@ -1,4 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
+import { NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs';
+import { InsightsService, type AnalyticsPage } from './insights.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -25,12 +28,18 @@ export class AppComponent {
   readonly store = inject(StoreService);
   readonly api = inject(ApiService);
   readonly router = inject(Router);
+  readonly insights = inject(InsightsService);
   search = '';
   brandLogoFailed = false;
   chatOpen = signal(false);
   chatText = '';
   thinking = signal(false);
   constructor() {
+    this.router.events.pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd)).subscribe(event => {
+      const segment = event.urlAfterRedirects.split('?')[0].split('/')[1] || 'home';
+      const page: AnalyticsPage = ['home','shop','product','cart','checkout','orders','favorites','account','admin','feedback'].includes(segment) ? segment as AnalyticsPage : 'other';
+      this.insights.track('page_view', page);
+    });
     // Older API deployments omit the rule; the store then keeps its default.
     this.api.meta().subscribe({ next: (meta) => this.store.useShippingRule(meta.shipping) });
   }
@@ -49,6 +58,7 @@ export class AppComponent {
     image.src = '/assets/brand/kasidrop-icon-transparent.webp';
   }
   searchNow() {
+    if (this.search.trim()) this.insights.track('product_search', 'shop');
     this.router.navigate(['/shop'], {
       queryParams: this.search.trim() ? { q: this.search.trim() } : {},
     });
@@ -59,6 +69,7 @@ export class AppComponent {
     this.chatMessages.update((items) => [...items, { from: 'user', text: message }]);
     this.chatText = '';
     this.thinking.set(true);
+    this.insights.track('ai_chat');
     this.api.chat(message).subscribe({
       next: (result) => {
         this.chatMessages.update((items) => [
