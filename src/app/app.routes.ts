@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { FeedbackPage } from './feedback.page';
 import { HomePage, ShopPage, ProductPage, FavoritesPage } from './shop.pages';
 import { CartPage, CheckoutPage, OrdersPage } from './customer.pages';
 import { AccountPage } from './profile.page';
@@ -12,6 +13,7 @@ export const routes: Routes = [
   { path: 'checkout', component: CheckoutPage, title: 'Checkout | KasiDrop' },
   { path: 'orders', component: OrdersPage, title: 'Your Orders | KasiDrop' },
   { path: 'account', component: AccountPage, title: 'Your Account | KasiDrop' },
+  { path: 'feedback', component: FeedbackPage, title: 'Feedback | KasiDrop' },
   { path: 'admin', component: AdminPage, title: 'Admin | KasiDrop' },
   { path: '**', redirectTo: '' },
 ];
