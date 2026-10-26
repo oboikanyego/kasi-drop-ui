@@ -35,11 +35,26 @@ export class AppComponent {
   chatText = '';
   thinking = signal(false);
   constructor() {
-    this.router.events.pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd)).subscribe(event => {
-      const segment = event.urlAfterRedirects.split('?')[0].split('/')[1] || 'home';
-      const page: AnalyticsPage = ['home','shop','product','cart','checkout','orders','favorites','account','admin','feedback'].includes(segment) ? segment as AnalyticsPage : 'other';
-      this.insights.track('page_view', page);
-    });
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event) => {
+        const segment = event.urlAfterRedirects.split('?')[0].split('/')[1] || 'home';
+        const page: AnalyticsPage = [
+          'home',
+          'shop',
+          'product',
+          'cart',
+          'checkout',
+          'orders',
+          'favorites',
+          'account',
+          'admin',
+          'feedback',
+        ].includes(segment)
+          ? (segment as AnalyticsPage)
+          : 'other';
+        this.insights.track('page_view', page);
+      });
     // Older API deployments omit the rule; the store then keeps its default.
     this.api.meta().subscribe({ next: (meta) => this.store.useShippingRule(meta.shipping) });
   }

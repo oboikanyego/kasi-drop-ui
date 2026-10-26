@@ -38,7 +38,6 @@ export class HomePage implements OnInit {
     });
   }
   searchNow() {
-
     this.router.navigate(['/shop'], {
       queryParams: this.searchTerm.trim() ? { q: this.searchTerm.trim() } : {},
     });
