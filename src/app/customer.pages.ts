@@ -1,4 +1,5 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { InsightsService } from './insights.service';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription, timer, switchMap, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -23,6 +24,7 @@ export class CartPage {
   styleUrls: ['./profile-page.scss'],
 })
 export class CheckoutPage implements OnInit {
+  insights = inject(InsightsService);
   api = inject(ApiService);
   store = inject(StoreService);
   router = inject(Router);
@@ -93,11 +95,13 @@ export class CheckoutPage implements OnInit {
     if (this.busy || !this.store.selectedCart().length || !this.store.user()) return;
     this.busy = true;
     this.error = '';
+    this.insights.track('checkout_started', 'checkout');
     const items = this.store
       .selectedCart()
       .map((l) => ({ productId: l.product.id, quantity: l.quantity }));
     this.api.checkout({ items, paymentMethod: this.method, delivery: this.delivery }).subscribe({
       next: (r) => {
+        this.insights.track('checkout_created', 'checkout');
         if (r.payment) {
           // Store order reference before leaving for PayFast. A browser redirect is not payment proof.
           this.store.rememberPendingCheckout(r.order.id, items);
