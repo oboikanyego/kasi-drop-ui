@@ -55,7 +55,6 @@ The storefront calls the real API through Netlify's \`/api/\*\` proxy. If the AP
 
 To enable accounts, stock, orders and checkout, deploy [kasi-drop-api](https://github.com/oboikanyego/kasi-drop-api) to Render, set its \`CLIENT_URL\` to this Netlify origin, and update \`netlify.toml\` to point at the **actual** Render URL. Verify \`GET /api/meta\` and \`GET /api/products\` return 200 through Netlify before accepting demo orders.
 
-
 ## Analytics and customer feedback
 
 The app anonymously records broad page views, catalogue searches (without query text), AI chat invocations (without prompts), add-to-cart actions, checkout starts and checkout creations. Events are sent to `POST /api/analytics/events` without personal identifiers; analytics requests do not block shopping.
@@ -63,4 +62,3 @@ The app anonymously records broad page views, catalogue searches (without query 
 Customers can share feedback at **`/feedback`**. The form supports bug reports, suggestions and shopping-experience feedback with an optional 1–5 rating. Submissions go to `POST /api/feedback`.
 
 The **Admin → Insights & Feedback** tab shows 30-day anonymous event counts, checkout creation/start percentage, HTTP 5xx event counts and recent tester feedback. These are **not unique visitor numbers or confirmed payment conversions**. The admin routes require authenticated admin access.
-
