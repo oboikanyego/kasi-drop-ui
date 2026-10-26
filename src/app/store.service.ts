@@ -3,6 +3,7 @@ import { HttpClient, HttpInterceptorFn } from '@angular/common/http';
 import { catchError, firstValueFrom, of, tap, throwError, timeout } from 'rxjs';
 import { previewProducts, searchPreview } from './preview-catalogue';
 import { isApiUnavailable } from './api-availability';
+import { InsightsService } from './insights.service';
 import {
   defaultShippingRule,
   parseShippingRule,
@@ -86,6 +87,7 @@ export class StoreService {
     this.user() ? [] : this.restore<string[]>('kasi_guest_favorites', []),
   );
   private readonly favoritesApi = inject(ApiService);
+  private readonly insights = inject(InsightsService);
   private favoritesQueue = Promise.resolve();
   private favoritesRevision = 0;
   constructor() {
@@ -162,6 +164,7 @@ export class StoreService {
     });
     this.selectedIds.update((ids) => (ids.includes(product.id) ? ids : [...ids, product.id]));
     this.persist();
+    this.insights.track('add_to_cart', 'cart');
     this.notify(product.name + ' added to your bag');
   }
   update(id: string, quantity: number) {
