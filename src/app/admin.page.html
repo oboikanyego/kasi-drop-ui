@@ -10,7 +10,10 @@
     <button [class.active]="tab==='overview'" (click)="tab='overview'">Overview</button
     ><button [class.active]="tab==='products'" (click)="tab='products'">Inventory</button
     ><button [class.active]="tab==='orders'" (click)="tab='orders'">Orders</button
-    ><button [class.active]="tab==='add'" (click)="tab='add'">+ Add product</button><button [class.active]="tab==='insights'" (click)="tab='insights';refresh()">Insights &amp; Feedback</button>
+    ><button [class.active]="tab==='add'" (click)="tab='add'">+ Add product</button
+    ><button [class.active]="tab==='insights'" (click)="tab='insights';refresh()">
+      Insights &amp; Feedback
+    </button>
   </div>
   <p *ngIf="notice" class="success-msg">{{notice}}</p>
   <p *ngIf="error" class="error-msg">{{error}}</p>
@@ -54,22 +57,61 @@
   </div>
   <div *ngIf="tab==='insights'">
     <h2>Shopping analytics · last 30 days</h2>
-    <p>Anonymous interaction counts. Page views are not unique visitors; checkout creation is not confirmed payment.</p>
+    <p>
+      Anonymous interaction counts. Page views are not unique visitors; checkout creation is not
+      confirmed payment.
+    </p>
     <div class="stats-grid">
       <div><small>Page views</small><strong>{{analytics?.counts?.['page_view'] || 0}}</strong></div>
-      <div><small>Product searches</small><strong>{{analytics?.counts?.['product_search'] || 0}}</strong></div>
-      <div><small>AI assistant interactions</small><strong>{{analytics?.counts?.['ai_chat'] || 0}}</strong></div>
-      <div><small>Add to cart</small><strong>{{analytics?.counts?.['add_to_cart'] || 0}}</strong></div>
-      <div><small>Checkout starts</small><strong>{{analytics?.counts?.['checkout_started'] || 0}}</strong></div>
-      <div><small>Checkouts created</small><strong>{{analytics?.counts?.['checkout_created'] || 0}}</strong></div>
-      <div><small>Checkout creation rate</small><strong>{{analytics?.checkoutConversion || 0}}%</strong></div>
-      <div><small>API server errors (5xx)</small><strong>{{analytics?.counts?.['api_error'] || 0}}</strong></div>
+      <div>
+        <small>Product searches</small
+        ><strong>{{analytics?.counts?.['product_search'] || 0}}</strong>
+      </div>
+      <div>
+        <small>AI assistant interactions</small
+        ><strong>{{analytics?.counts?.['ai_chat'] || 0}}</strong>
+      </div>
+      <div>
+        <small>Add to cart</small><strong>{{analytics?.counts?.['add_to_cart'] || 0}}</strong>
+      </div>
+      <div>
+        <small>Checkout starts</small
+        ><strong>{{analytics?.counts?.['checkout_started'] || 0}}</strong>
+      </div>
+      <div>
+        <small>Checkouts created</small
+        ><strong>{{analytics?.counts?.['checkout_created'] || 0}}</strong>
+      </div>
+      <div>
+        <small>Checkout creation rate</small
+        ><strong>{{analytics?.checkoutConversion || 0}}%</strong>
+      </div>
+      <div>
+        <small>API server errors (5xx)</small
+        ><strong>{{analytics?.counts?.['api_error'] || 0}}</strong>
+      </div>
     </div>
     <h2>Early tester feedback</h2>
     <p *ngIf="!feedback.length">No feedback received yet.</p>
     <div class="table-wrap" *ngIf="feedback.length">
-      <table><thead><tr><th>Received</th><th>Type</th><th>Rating</th><th>Feedback</th></tr></thead>
-      <tbody><tr *ngFor="let item of feedback"><td>{{item.createdAt | date:'mediumDate'}}</td><td>{{item.category}}</td><td>{{item.rating || '—'}}</td><td style="white-space:pre-wrap;overflow-wrap:anywhere">{{item.message}}</td></tr></tbody></table>
+      <table>
+        <thead>
+          <tr>
+            <th>Received</th>
+            <th>Type</th>
+            <th>Rating</th>
+            <th>Feedback</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of feedback">
+            <td>{{item.createdAt | date:'mediumDate'}}</td>
+            <td>{{item.category}}</td>
+            <td>{{item.rating || '—'}}</td>
+            <td style="white-space: pre-wrap; overflow-wrap: anywhere">{{item.message}}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
   <div *ngIf="tab==='products'">
