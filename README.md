@@ -19,13 +19,22 @@ The app calls the API at relative path \`/api\` so Netlify proxies requests via 
 - `npm test`: fast unit and source checks (`tests/`)
 - `npm run test:e2e`: browser tests (`e2e/`) for checkout, PayFast return and admin flows. They drive the production build against a recording stub API (`e2e/stub-server.mjs`), so run `npm run build` first. Locally, install Chromium once with `npx playwright install chromium`.
 
+## Current integrations and persistence (October 2026)
+
+- **Live storefront:** https://kasi-drop.netlify.app/
+- **API:** Node.js/Express service deployed via Render. The app calls relative `/api` and relies on Netlify's proxy configuration; verify the current backend URL in `netlify.toml`.
+- **Shopping assistant:** Google Gemini is the primary AI provider, with Groq as a configured fallback and catalogue search as a non-AI fallback. Provider credentials are held on the backend, not in Ionic.
+- **Favourites:** Signed-in users' selections are saved in MongoDB via `GET /api/favorites`, `PUT /api/favorites/:productId`, `DELETE /api/favorites/:productId`, and `POST /api/favorites/merge`. Guest selections use `kasi_guest_favorites` in localStorage and can be merged after sign-in. They are **not** sessionStorage-only.
+- **Health checks:** `GET /health` is the backend liveness route; `GET /api/health` is readiness (MongoDB-aware in persistent mode). A suspended Render service cannot respond to these probes.
+- **Code style:** `npm run format` applies Prettier, and `npm run format:check` checks formatting.
+
 ## Journey coverage
 
 - Homepage, featured products, categories, catalogue filters, product details
 - Persistent shopping bag (browser storage), shipping calculation and checkout
 - Demo customer signup/login and order history
 - Admin KPI dashboard, stock editing, order fulfilment and product creation
-- Claude-powered chat (when API key exists) and assisted admin listing draft
+- Gemini-powered chat (with Groq fallback when configured) and assisted admin listing draft
 
 Demo customer \`shopper@kasidrop.test\` / \`Demo@12345\`; demo admin \`admin@kasidrop.test\` / \`Demo@12345\`. Demo data is ephemeral, and checkout is simulated; these credentials must not be used for live customers.
 
