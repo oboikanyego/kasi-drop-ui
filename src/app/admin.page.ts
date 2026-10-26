@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -11,8 +12,11 @@ import { ApiService, StoreService, Product, Order } from './store.service';
 })
 export class AdminPage implements OnInit {
   api = inject(ApiService);
+  private http = inject(HttpClient);
+  analytics?: { periodDays: number; counts: Record<string, number>; checkoutConversion: number; note: string };
+  feedback: Array<{ category: string; rating?: number; message: string; createdAt: string }> = [];
   store = inject(StoreService);
-  tab: 'overview' | 'products' | 'orders' | 'add' = 'overview';
+  tab: 'overview' | 'products' | 'orders' | 'add' | 'insights' = 'overview';
   summary?: {
     products: number;
     lowStock: number;
@@ -45,6 +49,8 @@ export class AdminPage implements OnInit {
     if (this.store.user()?.role === 'admin') this.refresh();
   }
   refresh() {
+    this.http.get<{ periodDays: number; counts: Record<string, number>; checkoutConversion: number; note: string }>('/api/admin/analytics').subscribe({ next: r => this.analytics = r, error: () => this.error = 'Could not load analytics.' });
+    this.http.get<{ feedback: Array<{ category: string; rating?: number; message: string; createdAt: string }> }>('/api/admin/feedback').subscribe({ next: r => this.feedback = r.feedback, error: () => this.error = 'Could not load customer feedback.' });
     this.api.adminSummary().subscribe({
       next: (r) => (this.summary = r),
       error: () => (this.error = 'Could not load admin summary.'),
@@ -115,7 +121,7 @@ export class AdminPage implements OnInit {
           this.generating = false;
         },
         error: (e) => {
-          this.error = e.error?.error || 'AI drafting unavailable. Configure the Claude API key.';
+          this.error = e.error?.error || 'AI drafting unavailable. Configure Gemini or Groq on the backend.';
           this.generating = false;
         },
       });
