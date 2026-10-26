@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { InsightsService } from './insights.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
@@ -37,6 +38,7 @@ export class HomePage implements OnInit {
     });
   }
   searchNow() {
+
     this.router.navigate(['/shop'], {
       queryParams: this.searchTerm.trim() ? { q: this.searchTerm.trim() } : {},
     });
@@ -51,6 +53,7 @@ export class HomePage implements OnInit {
 export class ShopPage implements OnInit {
   readonly api = inject(ApiService);
   readonly route = inject(ActivatedRoute);
+  readonly insights = inject(InsightsService);
   products: Product[] = [];
   categories = ['All', 'Food & Drink', 'Fashion', 'Home & Living', 'Crafts'];
   category = 'All';
@@ -67,6 +70,7 @@ export class ShopPage implements OnInit {
     });
   }
   load() {
+    if (this.q.trim()) this.insights.track('product_search', 'shop');
     this.loading = true;
     this.error = '';
     const params = new URLSearchParams();
