@@ -30,8 +30,100 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <style>
+      /* Splash shown inside <app-root> until the API has answered and the app boots. */
+      body {
+        margin: 0;
+      }
+      .boot-splash {
+        min-height: 100vh;
+        min-height: 100dvh;
+        box-sizing: border-box;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        text-align: center;
+        background: #fffdf9;
+        color: #20372f;
+        font-family: 'DM Sans', system-ui, sans-serif;
+      }
+      .boot-mark {
+        position: relative;
+        width: 84px;
+        height: 84px;
+        display: grid;
+        place-items: center;
+      }
+      .boot-mark img {
+        width: 56px;
+        height: 56px;
+        object-fit: contain;
+        border-radius: 12px;
+      }
+      .boot-ring {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 3px solid #e7e8df;
+        border-top-color: #9bd300;
+        animation: boot-spin 0.9s linear infinite;
+      }
+      .boot-name {
+        margin: 0;
+        font-family: 'Outfit', 'DM Sans', sans-serif;
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -1.5px;
+        color: #15201b;
+      }
+      .boot-name b {
+        color: #9bd300;
+        font-weight: 800;
+      }
+      .boot-message {
+        margin: 0;
+        max-width: 320px;
+        font-size: 15px;
+        line-height: 1.5;
+        color: #69766e;
+      }
+      .boot-message[hidden] {
+        display: none;
+      }
+      @keyframes boot-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .boot-ring {
+          animation-duration: 3s;
+        }
+      }
+    </style>
   </head>
   <body>
-    <app-root></app-root>
+    <app-root>
+      <div
+        id="boot-splash"
+        class="boot-splash"
+        role="status"
+        aria-live="polite"
+        aria-label="Loading KasiDrop"
+      >
+        <div class="boot-mark">
+          <span class="boot-ring" aria-hidden="true"></span>
+          <img src="/assets/brand/kasidrop-icon-transparent.webp" alt="" width="56" height="56" />
+        </div>
+        <p class="boot-name">kasi<b>drop</b></p>
+        <p id="boot-wake-message" class="boot-message" hidden>
+          Waking up the shop. It rests when it's quiet, so the first visit can take up to a minute.
+          Hang tight, we're nearly there.
+        </p>
+      </div>
+    </app-root>
   </body>
 </html>
