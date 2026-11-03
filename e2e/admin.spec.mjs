@@ -1,4 +1,4 @@
-import { test, expect, seed, admin, customer } from './fixtures.mjs';
+import { test, expect, seed, admin, customer, makePng } from './fixtures.mjs';
 
 const paidOrder = {
   id: 'ord-paid-1',
@@ -63,12 +63,18 @@ test('an admin publishes a product with its tags split into a list', async ({ pa
   await form.locator('input[name=price]').fill('85');
   await form.locator('input[name=stock]').fill('12');
   await form.locator('input[name=tags]').fill('beads,  gift , ');
+  await form.locator('input[type=file]').setInputFiles({
+    name: 'keyring.png',
+    mimeType: 'image/png',
+    buffer: makePng(600, 400),
+  });
+  await expect(form.locator('.photo-preview img')).toBeVisible();
   await form.getByRole('button', { name: /Publish product/ }).click();
 
   await expect(page.locator('.success-msg')).toHaveText('Product published');
   await expect(page.getByRole('heading', { name: 'Manage products' })).toBeVisible();
-  const created = (await adminCalls(stub)).find((r) => r.method === 'POST');
-  expect(created.path).toBe('/api/admin/products');
+  const created = (await adminCalls(stub)).find((r) => r.path === '/api/admin/products');
+  expect(created.method).toBe('POST');
   expect(created.body).toMatchObject({
     name: 'Beaded Keyring',
     description: 'Hand-beaded keyring made in Soweto.',
@@ -76,6 +82,7 @@ test('an admin publishes a product with its tags split into a list', async ({ pa
     price: 85,
     stock: 12,
     tags: ['beads', 'gift'],
+    image: '/api/images/img-1',
     featured: false,
     active: true,
   });

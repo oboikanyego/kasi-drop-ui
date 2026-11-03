@@ -1,4 +1,5 @@
 import { test as base, expect } from '@playwright/test';
+import { crc32, deflateSync } from 'node:zlib';
 import { products } from './stub-server-data.mjs';
 
 const encodeSession = (user) => Buffer.from(JSON.stringify(user)).toString('base64url');
@@ -64,3 +65,27 @@ export const storedCart = (page) =>
   page.evaluate(() =>
     JSON.parse(localStorage.getItem('kasi_cart') || '[]').map((l) => [l.product.id, l.quantity]),
   );
+
+/** A plain-colour PNG of any size, so tests can pick real photos without checked-in image files. */
+export function makePng(width, height, [r, g, b] = [120, 170, 60]) {
+  const row = Buffer.alloc(1 + width * 3); // each row starts with a filter byte of 0
+  for (let x = 0; x < width; x++) row.set([r, g, b], 1 + x * 3);
+  const chunk = (type, data) => {
+    const body = Buffer.concat([Buffer.from(type), data]);
+    const length = Buffer.alloc(4);
+    length.writeUInt32BE(data.length);
+    const crc = Buffer.alloc(4);
+    crc.writeUInt32BE(crc32(body));
+    return Buffer.concat([length, body, crc]);
+  };
+  const header = Buffer.alloc(13);
+  header.writeUInt32BE(width, 0);
+  header.writeUInt32BE(height, 4);
+  header.set([8, 2], 8); // 8 bits per channel, RGB
+  return Buffer.concat([
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    chunk('IHDR', header),
+    chunk('IDAT', deflateSync(Buffer.concat(Array.from({ length: height }, () => row)))),
+    chunk('IEND', Buffer.alloc(0)),
+  ]);
+}

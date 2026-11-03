@@ -35,7 +35,7 @@ The app calls the API at relative path \`/api\` so Netlify proxies requests via 
 - Homepage, featured products, categories, catalogue filters, product details
 - Persistent shopping bag (browser storage), shipping calculation and checkout
 - Demo customer signup/login and order history
-- Admin KPI dashboard, stock editing, order fulfilment and product creation
+- Admin KPI dashboard, stock editing, order fulfilment and product creation (photos are uploaded, shrunk in the browser to 1200px and stored by the API)
 - Gemini-powered chat (with Groq fallback when configured) and assisted admin listing draft
 
 Demo customer \`shopper@kasidrop.test\` / \`Demo@12345\`; demo admin \`admin@kasidrop.test\` / \`Demo@12345\`. Demo data is ephemeral, and checkout is simulated; these credentials must not be used for live customers.

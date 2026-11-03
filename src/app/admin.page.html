@@ -234,13 +234,51 @@
               required /></label
           ><label>Tags (comma separated)<input name="tags" [(ngModel)]="form.tags" /></label>
         </div>
-        <label>Image URL<input name="image" type="url" [(ngModel)]="form.image" required /></label
-        ><label class="checkbox-field"
+        <div class="photo-field">
+          <span class="photo-field-label">Product photo</span>
+          <div class="photo-row">
+            <div class="photo-preview">
+              <img *ngIf="imagePreview" [src]="imagePreview" alt="Preview of the product photo" />
+              <span *ngIf="!imagePreview">{{uploadingImage?'Uploading…':'No photo yet'}}</span>
+            </div>
+            <div class="photo-actions">
+              <label class="btn btn-outline photo-pick">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  (change)="chooseImage($event)"
+                  [disabled]="uploadingImage"
+                  aria-label="Choose a product photo"
+                />
+                {{uploadingImage?'Uploading…':form.image?'Replace photo':'Choose photo'}}
+              </label>
+              <button
+                type="button"
+                class="photo-remove"
+                *ngIf="form.image"
+                (click)="removeImage()"
+                [disabled]="uploadingImage"
+              >
+                Remove photo
+              </button>
+              <small>JPG, PNG or WebP. Large photos are shrunk automatically.</small>
+            </div>
+          </div>
+          <p *ngIf="imageError" class="error-msg" role="alert">{{imageError}}</p>
+        </div>
+        <label class="checkbox-field"
           ><input name="featured" type="checkbox" [(ngModel)]="form.featured" /> Feature on
           homepage</label
-        ><button class="btn btn-orange" type="submit" [disabled]="busy">
+        ><button
+          class="btn btn-orange"
+          type="submit"
+          [disabled]="busy||uploadingImage||!form.image"
+        >
           {{busy?'Saving…':'Publish product ↗'}}
         </button>
+        <small class="photo-hint" *ngIf="!form.image&&!uploadingImage"
+          >Add a photo to publish your product.</small
+        >
       </form>
     </div>
     <aside class="ai-editor">

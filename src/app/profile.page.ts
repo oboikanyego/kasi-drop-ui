@@ -11,6 +11,7 @@ import {
   type ProfileUpdate,
   type SavedAddress,
 } from './store.service';
+import { prepareImage } from './image-upload';
 
 const blankAddress = (): AddressInput => ({
   label: 'Home',
@@ -298,33 +299,6 @@ export class AccountPage implements OnInit, OnDestroy {
       error: () => this.clearAvatarUrl(),
     });
   }
-  private async resizeAvatar(file: File): Promise<Blob> {
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type))
-      throw Error('Choose a JPG, PNG or WebP image.');
-    if (file.size > 5 * 1024 * 1024) throw Error('Choose an image smaller than 5 MB.');
-    const bitmap = await createImageBitmap(file);
-    try {
-      const maxSide = 600,
-        scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.max(1, Math.round(bitmap.width * scale));
-      canvas.height = Math.max(1, Math.round(bitmap.height * scale));
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw Error('Image processing is unavailable in this browser.');
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-      for (const quality of [0.86, 0.7, 0.52]) {
-        const blob = await new Promise<Blob | null>((resolve) =>
-          canvas.toBlob(resolve, 'image/jpeg', quality),
-        );
-        if (blob && blob.size <= 512 * 1024) return blob;
-      }
-      throw Error('Unable to compress the image. Please choose a smaller photo.');
-    } finally {
-      bitmap.close();
-    }
-  }
   async chooseAvatar(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -333,7 +307,7 @@ export class AccountPage implements OnInit, OnDestroy {
     this.savingAvatar = true;
     this.avatarError = '';
     try {
-      const optimized = await this.resizeAvatar(file);
+      const optimized = await prepareImage(file, { maxSide: 600, maxBytes: 512 * 1024 });
       this.api.uploadAvatar(optimized).subscribe({
         next: ({ avatarUpdatedAt }) => {
           if (this.profile) this.profile = { ...this.profile, avatarUpdatedAt };

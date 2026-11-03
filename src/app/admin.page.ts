@@ -1,16 +1,32 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { ApiService, StoreService, Product, Order } from './store.service';
+import { prepareImage } from './image-upload';
+
+/** A new product starts empty; its photo is uploaded rather than linked. */
+const blankForm = () => ({
+  name: '',
+  description: '',
+  category: 'Crafts',
+  price: 199,
+  stock: 10,
+  image: '', // path of the uploaded photo, e.g. /api/images/<id>
+  tags: 'local, handmade',
+  featured: false,
+  active: true,
+});
+/** The API accepts photos up to 1 MB, so larger ones are shrunk first. */
+const productPhoto = { maxSide: 1200, maxBytes: 1024 * 1024 };
 @Component({
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, IonicModule],
   templateUrl: './admin.page.html',
 })
-export class AdminPage implements OnInit {
+export class AdminPage implements OnInit, OnDestroy {
   api = inject(ApiService);
   private http = inject(HttpClient);
   analytics?: {
@@ -36,18 +52,11 @@ export class AdminPage implements OnInit {
   busy = false;
   error = '';
   notice = '';
-  form = {
-    name: '',
-    description: '',
-    category: 'Crafts',
-    price: 199,
-    stock: 10,
-    image:
-      'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=800',
-    tags: 'local, handmade',
-    featured: false,
-    active: true,
-  };
+  form = blankForm();
+  /** Browser-local preview of the chosen photo (an object URL, released when replaced). */
+  imagePreview: string | null = null;
+  uploadingImage = false;
+  imageError = '';
   notes = '';
   generating = false;
   ngOnInit() {
@@ -116,6 +125,10 @@ export class AdminPage implements OnInit {
         next: () => {
           this.busy = false;
           this.notice = 'Product published';
+          // Start the next product from scratch rather than reusing this one's photo and text.
+          this.form = blankForm();
+          this.notes = '';
+          this.setImage('', null);
           this.tab = 'products';
           this.refresh();
         },
@@ -124,6 +137,45 @@ export class AdminPage implements OnInit {
           this.error = e.error?.error || 'Could not save product';
         },
       });
+  }
+  async chooseImage(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file || this.uploadingImage) return;
+    this.uploadingImage = true;
+    this.imageError = '';
+    let photo: Blob;
+    try {
+      photo = await prepareImage(file, productPhoto);
+    } catch (e) {
+      this.imageError = e instanceof Error ? e.message : 'Could not process this image.';
+      this.uploadingImage = false;
+      return;
+    }
+    this.api.uploadProductImage(photo).subscribe({
+      next: ({ url }) => {
+        this.setImage(url, photo);
+        this.uploadingImage = false;
+      },
+      error: (e) => {
+        // The previous photo, if any, stays selected.
+        this.imageError = e.error?.error || 'Photo upload failed. Please try again.';
+        this.uploadingImage = false;
+      },
+    });
+  }
+  removeImage() {
+    this.setImage('', null);
+    this.imageError = '';
+  }
+  private setImage(url: string, photo: Blob | null) {
+    if (this.imagePreview) URL.revokeObjectURL(this.imagePreview);
+    this.imagePreview = photo ? URL.createObjectURL(photo) : null;
+    this.form.image = url;
+  }
+  ngOnDestroy() {
+    if (this.imagePreview) URL.revokeObjectURL(this.imagePreview);
   }
   generate() {
     this.generating = true;

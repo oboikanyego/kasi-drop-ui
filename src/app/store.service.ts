@@ -469,6 +469,12 @@ export class ApiService {
       headers: { 'Content-Type': photo.type },
     });
   }
+  /** Upload an admin's product photo; the API returns the path to store as the product's image. */
+  uploadProductImage(photo: Blob) {
+    return this.http.post<{ url: string }>(this.base + '/admin/images', photo, {
+      headers: { 'Content-Type': photo.type },
+    });
+  }
   removeAvatar() {
     return this.http.delete(this.base + '/profile/avatar');
   }
