@@ -30,7 +30,15 @@ export type WakeOptions = {
   schedule?: (fn: () => void, ms: number) => () => void;
   /** Called once if the API has not answered after `slowAfterMs`. */
   onSlow?: () => void;
+  /** Overrides `giveUpAfterMs`, e.g. a shorter wait when the check is blocking a page in use. */
+  giveUpAfterMs?: number;
 };
+
+/** Run `fn` after `ms` with a real timer; returns a function that cancels it. */
+export function timerSchedule(fn: () => void, ms: number): () => void {
+  const timer = setTimeout(fn, ms);
+  return () => clearTimeout(timer);
+}
 
 const localHosts = ['localhost', '127.0.0.1', '[::1]'];
 /**
@@ -97,12 +105,8 @@ export async function wakeApi(options: WakeOptions = {}): Promise<WakeOutcome> {
   const now = options.now ?? Date.now;
   const sleep =
     options.sleep ?? ((ms: number) => new Promise<void>((done) => setTimeout(done, ms)));
-  const schedule =
-    options.schedule ??
-    ((fn: () => void, ms: number) => {
-      const timer = setTimeout(fn, ms);
-      return () => clearTimeout(timer);
-    });
+  const schedule = options.schedule ?? timerSchedule;
+  const giveUpAfter = options.giveUpAfterMs ?? giveUpAfterMs;
   let storage = options.storage;
   let place = options.location;
   try {
@@ -126,7 +130,7 @@ export async function wakeApi(options: WakeOptions = {}): Promise<WakeOutcome> {
   const cancelSlow = schedule(() => options.onSlow?.(), slowAfterMs);
   try {
     for (;;) {
-      const timeout = Math.min(attemptTimeoutMs, giveUpAfterMs - (now() - started));
+      const timeout = Math.min(attemptTimeoutMs, giveUpAfter - (now() - started));
       if (timeout < minAttemptMs) return 'gave-up';
       if (await askApi(fetcher, timeout)) {
         try {
