@@ -68,6 +68,8 @@ function reset(options = {}) {
     // orderId -> statuses returned on successive GET /api/orders calls (the last one repeats).
     sequences: options.sequences ?? {},
     listCalls: 0,
+    // A sleeping Render service: this many wake-up requests (/api/meta?wake=1) fail with a 503.
+    wakeFailures: options.wakeFailures ?? 0,
     requests: [],
   };
 }
@@ -115,18 +117,23 @@ function newOrder(payload, status) {
   state.orders.unshift(order);
   return order;
 }
-async function api(req, res, path) {
+async function api(req, res, path, search = '') {
   const raw = await readBody(req);
   const body = raw && (req.headers['content-type'] || '').includes('json') ? JSON.parse(raw) : raw;
   state.requests.push({
     method: req.method,
     path,
+    search,
     body,
     auth: req.headers.authorization || '',
     cookie: req.headers.cookie || '',
     csrf: req.headers['x-kasidrop-csrf'] || '',
   });
   const route = req.method + ' ' + path;
+  if (route === 'GET /api/meta' && search.includes('wake=1') && state.wakeFailures > 0) {
+    state.wakeFailures--;
+    return send(res, 503, 'Service Unavailable', 'text/plain');
+  }
   const user = sessionUser(req);
   const isPublic = publicRoutes.includes(route) || route.startsWith('GET /api/products/');
   if (!isPublic && !user) return send(res, 401, { error: 'Sign in required' });
@@ -243,7 +250,7 @@ http
       state.requests.push({ method: req.method, path: url.pathname, body: form });
       return send(res, 200, '<h1>PayFast sandbox (stub)</h1>', 'text/html');
     }
-    if (url.pathname.startsWith('/api/')) return api(req, res, url.pathname);
+    if (url.pathname.startsWith('/api/')) return api(req, res, url.pathname, url.search);
     // Static build; relative asset URLs under deep links fall back to the file by name.
     let file = join(root, url.pathname);
     if (!existsSync(file) || statSync(file).isDirectory()) {

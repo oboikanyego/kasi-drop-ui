@@ -9,6 +9,8 @@
 - Start the [KasiDrop API](https://github.com/oboikanyego/kasi-drop-api) on port 10000, or use the live Render deployment.
 - For local development use a proxy: \`npm start -- --proxy-config proxy.conf.json\`.
 
+**Sleeping API:** Render's free tier sleeps the API after 15 minutes without traffic, and the first request then takes 30-60 seconds. On a first visit (or when the last confirmation is over 10 minutes old) the app shows a splash screen and asks `GET /api/meta?wake=1` until the API answers, retrying every 2 seconds, and only then boots. After 3 seconds the splash explains the wait. If the API still has not answered after 2 minutes the app boots anyway, into its offline preview. Local development skips this; open the page with `?wake=1` to try it. The timings are constants at the top of `src/app/wake-api.ts`.
+
 Sign-in uses an httpOnly session cookie set by the API, so no token is ever stored in the browser or readable by page scripts. That relies on the app reaching the API at the same origin (the `/api` proxy). Requests carry an `X-KasiDrop-CSRF` header, which the API requires for cookie-authenticated changes. A token left in `localStorage` by an older release is swapped for the cookie on the next visit.
 
 The app calls the API at relative path \`/api\` so Netlify proxies requests via \`netlify.toml\`. Configure the Render service URL in that file if your assigned hostname differs. The UI needs the API for products, login and checkout.
