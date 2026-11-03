@@ -70,6 +70,10 @@ function reset(options = {}) {
     listCalls: 0,
     // A sleeping Render service: this many wake-up requests (/api/meta?wake=1) fail with a 503.
     wakeFailures: options.wakeFailures ?? 0,
+    // When set, product photo uploads fail with this message (as the API would for a bad image).
+    imageUploadError: options.imageUploadError ?? null,
+    images: new Map(),
+    avatar: null,
     requests: [],
   };
 }
@@ -78,12 +82,30 @@ const send = (res, status, body, type = 'application/json') => {
   res.writeHead(status, { 'content-type': type });
   res.end(type === 'application/json' ? JSON.stringify(body) : body);
 };
-const readBody = (req) =>
+const readBuffer = (req) =>
   new Promise((done) => {
-    let data = '';
-    req.on('data', (chunk) => (data += chunk));
-    req.on('end', () => done(data));
+    const chunks = [];
+    req.on('data', (chunk) => chunks.push(chunk));
+    req.on('end', () => done(Buffer.concat(chunks)));
   });
+const readBody = async (req) => (await readBuffer(req)).toString('utf8');
+/** Width and height of a JPEG, read from its start-of-frame marker. */
+function jpegSize(bytes) {
+  for (let i = 2; i + 9 < bytes.length; ) {
+    if (bytes[i] !== 0xff) return null;
+    const marker = bytes[i + 1];
+    if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker))
+      return { height: bytes.readUInt16BE(i + 5), width: bytes.readUInt16BE(i + 7) };
+    i += 2 + bytes.readUInt16BE(i + 2);
+  }
+  return null;
+}
+/** What a test needs to know about an uploaded image: its type, size and (JPEG) dimensions. */
+const describeImage = (bytes, contentType) => ({
+  contentType,
+  size: bytes.length,
+  ...(contentType === 'image/jpeg' ? jpegSize(bytes) : {}),
+});
 function ordersNow() {
   const call = state.listCalls++;
   return state.orders.map((o) => {
@@ -118,8 +140,14 @@ function newOrder(payload, status) {
   return order;
 }
 async function api(req, res, path, search = '') {
-  const raw = await readBody(req);
-  const body = raw && (req.headers['content-type'] || '').includes('json') ? JSON.parse(raw) : raw;
+  const bytes = await readBuffer(req);
+  const contentType = req.headers['content-type'] || '';
+  const raw = contentType.startsWith('image/') ? '' : bytes.toString('utf8');
+  const body = contentType.startsWith('image/')
+    ? describeImage(bytes, contentType)
+    : raw && contentType.includes('json')
+      ? JSON.parse(raw)
+      : raw;
   state.requests.push({
     method: req.method,
     path,
@@ -135,7 +163,10 @@ async function api(req, res, path, search = '') {
     return send(res, 503, 'Service Unavailable', 'text/plain');
   }
   const user = sessionUser(req);
-  const isPublic = publicRoutes.includes(route) || route.startsWith('GET /api/products/');
+  const isPublic =
+    publicRoutes.includes(route) ||
+    route.startsWith('GET /api/products/') ||
+    route.startsWith('GET /api/images/');
   if (!isPublic && !user) return send(res, 401, { error: 'Sign in required' });
   if (!isPublic && req.method !== 'GET' && !req.headers['x-kasidrop-csrf'])
     return send(res, 403, { error: 'Missing CSRF header' });
@@ -229,6 +260,27 @@ async function api(req, res, path, search = '') {
     if (!order) return send(res, 404, { error: 'Not found' });
     order.status = body.status;
     return send(res, 200, { ok: true, status: body.status });
+  }
+  if (route === 'POST /api/admin/images') {
+    if (state.imageUploadError) return send(res, 415, { error: state.imageUploadError });
+    const id = 'img-' + (state.images.size + 1);
+    state.images.set(id, { type: contentType, bytes });
+    return send(res, 201, { url: '/api/images/' + id });
+  }
+  if (route.startsWith('GET /api/images/')) {
+    const image = state.images.get(path.split('/').pop());
+    if (!image) return send(res, 404, { error: 'Not found' });
+    res.writeHead(200, { 'content-type': image.type });
+    return res.end(image.bytes);
+  }
+  if (route === 'PUT /api/profile/avatar') {
+    state.avatar = { type: contentType, bytes };
+    return send(res, 200, { avatarUpdatedAt: new Date().toISOString() });
+  }
+  if (route === 'GET /api/profile/avatar') {
+    if (!state.avatar) return send(res, 404, { error: 'Not found' });
+    res.writeHead(200, { 'content-type': state.avatar.type });
+    return res.end(state.avatar.bytes);
   }
   if (route === 'POST /api/admin/products')
     return send(res, 201, { product: { ...body, id: 'new-product' } });
