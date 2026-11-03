@@ -93,6 +93,18 @@
       .boot-message[hidden] {
         display: none;
       }
+      /* The same splash as a full-screen cover, for coming back to a tab after the API went to sleep. */
+      .wake-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 2147483647;
+        animation: boot-fade 0.2s ease-out;
+      }
+      @keyframes boot-fade {
+        from {
+          opacity: 0;
+        }
+      }
       @keyframes boot-spin {
         to {
           transform: rotate(360deg);
@@ -101,6 +113,9 @@
       @media (prefers-reduced-motion: reduce) {
         .boot-ring {
           animation-duration: 3s;
+        }
+        .wake-overlay {
+          animation: none;
         }
       }
     </style>

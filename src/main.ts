@@ -7,7 +7,9 @@ import { registerKasiDropIcons } from './app/icons';
 import { routes } from './app/app.routes';
 import { apiInterceptor } from './app/store.service';
 import { migrateLegacySession } from './app/legacy-session';
-import { wakeApi } from './app/wake-api';
+import { timerSchedule, wakeApi } from './app/wake-api';
+import { returnGiveUpAfterMs, watchForReturn } from './app/wake-on-return';
+import { createWakeOverlay } from './app/wake-overlay';
 // Register SVGs before Angular bootstraps any Ionic icon component.
 registerKasiDropIcons();
 // Wake a sleeping API first (the splash in index.html is showing), then move any token an older UI
@@ -27,6 +29,16 @@ wakeApi({
         provideHttpClient(withInterceptors([apiInterceptor])),
         provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'top' })),
       ],
+    }),
+  )
+  // A tab left open can outlive the API's sleep: when it is visited again, check the API behind a loader.
+  .then(() =>
+    watchForReturn({
+      document,
+      window,
+      wake: () => wakeApi({ giveUpAfterMs: returnGiveUpAfterMs }),
+      overlay: createWakeOverlay(),
+      schedule: timerSchedule,
     }),
   )
   .catch(console.error);
