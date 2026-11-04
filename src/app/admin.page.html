@@ -293,10 +293,14 @@
       ><button
         class="btn btn-outline btn-block"
         (click)="generate()"
-        [disabled]="generating||notes.length<5"
+        [disabled]="generating||!!aiHint"
       >
         {{generating?'Drafting…':'✦ Generate listing'}}</button
-      ><small>Requires Claude API configuration. Always verify AI-generated claims.</small>
+      ><small class="ai-hint" *ngIf="aiHint">{{aiHint}}</small
+      ><small
+        >Kasi AI drafts from your notes and can get details wrong. Check it before you
+        publish.</small
+      >
     </aside>
   </div>
 </div>

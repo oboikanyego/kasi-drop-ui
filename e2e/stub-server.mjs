@@ -72,6 +72,9 @@ function reset(options = {}) {
     wakeFailures: options.wakeFailures ?? 0,
     // When set, product photo uploads fail with this message (as the API would for a bad image).
     imageUploadError: options.imageUploadError ?? null,
+    // Whether the server has an AI key (shown by /api/meta), and an error for listing drafts to return.
+    aiEnabled: options.aiEnabled ?? true,
+    aiListingError: options.aiListingError ?? null,
     images: new Map(),
     avatar: null,
     requests: [],
@@ -194,7 +197,7 @@ async function api(req, res, path, search = '') {
     return send(res, 200, {
       categories: ['All'],
       demoMode: state.demoMode,
-      aiEnabled: false,
+      aiEnabled: state.aiEnabled,
       checkoutEnabled: true,
       shipping: { freeFrom: 750, fee: 79 },
     });
@@ -260,6 +263,16 @@ async function api(req, res, path, search = '') {
     if (!order) return send(res, 404, { error: 'Not found' });
     order.status = body.status;
     return send(res, 200, { ok: true, status: body.status });
+  }
+  if (route === 'POST /api/admin/ai/listing') {
+    if (state.aiListingError) return send(res, 503, { error: state.aiListingError });
+    return send(res, 200, {
+      draft: {
+        title: 'Hand-Beaded Heritage Keyring',
+        description: 'A hand-beaded keyring made in Soweto from glass beads.',
+        tags: ['beaded', 'handmade', 'gift'],
+      },
+    });
   }
   if (route === 'POST /api/admin/images') {
     if (state.imageUploadError) return send(res, 415, { error: state.imageUploadError });
