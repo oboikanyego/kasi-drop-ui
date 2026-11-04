@@ -76,3 +76,24 @@ test('a signed-out shopper is asked to sign in before checking out', async ({ pa
   await expect(page.getByRole('heading', { name: 'Sign in to continue' })).toBeVisible();
   expect((await stub.requests()).some((r) => r.path === '/api/orders/checkout')).toBe(false);
 });
+
+test('checkout fields stay locked until saved addresses load, so typing is never overwritten', async ({
+  page,
+  stub,
+}) => {
+  await stub.reset({ demoMode: true });
+  await seed(page, { user: customer, cart: [line('candle', 1)] });
+  let release;
+  const gate = new Promise((resolve) => (release = resolve));
+  await page.route('**/api/profile', async (route) => {
+    await gate;
+    await route.continue();
+  });
+  await page.goto('/checkout');
+  await expect(page.getByText('Loading your saved addresses…')).toBeVisible();
+  await expect(page.locator('input[name=address]')).toBeDisabled();
+  await expect(page.getByRole('button', { name: /Place demo order/ })).toBeDisabled();
+  release();
+  await expect(page.locator('input[name=address]')).toBeEnabled();
+  await expect(page.locator('input[name=address]')).toHaveValue('Flat 3, 12 Vilakazi Street');
+});
