@@ -11,76 +11,82 @@
     <p>Where should your order go?</p>
     <p *ngIf="addressLoading" class="profile-muted">Loading your saved addresses…</p>
     <form (ngSubmit)="submit()">
-      <div class="checkout-saved-addresses" *ngIf="savedAddresses.length">
+      <fieldset class="checkout-fields" [disabled]="addressLoading">
+        <div class="checkout-saved-addresses" *ngIf="savedAddresses.length">
+          <label
+            >Deliver to a saved address
+            <select
+              name="savedAddress"
+              [(ngModel)]="selectedAddressId"
+              (ngModelChange)="onAddressSelected()"
+              aria-label="Choose a saved delivery address"
+            >
+              <option *ngFor="let address of savedAddresses" [value]="address.id">
+                {{address.label}}{{address.nickname?' — '+address.nickname:''}}{{address.isDefault?'
+                (Default)':''}} · {{address.city}}
+              </option>
+              <option value="manual">Enter a different address</option>
+            </select>
+          </label>
+          <p>Change your choice anytime. <a routerLink="/account">Manage saved addresses</a></p>
+        </div>
+        <div class="form-grid">
+          <label
+            >Full name<input
+              name="name"
+              [(ngModel)]="delivery.name"
+              required
+              minlength="2" /></label
+          ><label
+            >Phone number<input name="phone" [(ngModel)]="delivery.phone" required minlength="8"
+          /></label>
+        </div>
         <label
-          >Deliver to a saved address
-          <select
-            name="savedAddress"
-            [(ngModel)]="selectedAddressId"
-            (ngModelChange)="onAddressSelected()"
-            aria-label="Choose a saved delivery address"
-          >
-            <option *ngFor="let address of savedAddresses" [value]="address.id">
-              {{address.label}}{{address.nickname?' — '+address.nickname:''}}{{address.isDefault?'
-              (Default)':''}} · {{address.city}}
-            </option>
-            <option value="manual">Enter a different address</option>
-          </select>
-        </label>
-        <p>Change your choice anytime. <a routerLink="/account">Manage saved addresses</a></p>
-      </div>
-      <div class="form-grid">
-        <label
-          >Full name<input name="name" [(ngModel)]="delivery.name" required minlength="2" /></label
-        ><label
-          >Phone number<input name="phone" [(ngModel)]="delivery.phone" required minlength="8"
+          >Street address<input
+            name="address"
+            [(ngModel)]="delivery.address"
+            required
+            minlength="5"
+            placeholder="Street and house number"
         /></label>
-      </div>
-      <label
-        >Street address<input
-          name="address"
-          [(ngModel)]="delivery.address"
-          required
-          minlength="5"
-          placeholder="Street and house number"
-      /></label>
-      <div class="form-grid">
-        <label>City / Town<input name="city" [(ngModel)]="delivery.city" required /></label
-        ><label
-          >Province<select name="province" [(ngModel)]="delivery.province">
-            <option>Gauteng</option>
-            <option>Western Cape</option>
-            <option>KwaZulu-Natal</option>
-            <option>Eastern Cape</option>
-            <option>Free State</option>
-            <option>Limpopo</option>
-            <option>Mpumalanga</option>
-            <option>North West</option>
-            <option>Northern Cape</option>
-          </select></label
-        >
-      </div>
-      <label
-        >Postal code<input
-          name="postalCode"
-          [(ngModel)]="delivery.postalCode"
-          required
-          minlength="3"
-      /></label>
-      <h2>Payment method</h2>
-      <div class="payment-choice">
-        <label *ngIf="demo"
-          ><input type="radio" name="payment" [(ngModel)]="method" value="demo" /> Simulated demo
-          payment <small>For testing only — no charge</small></label
-        ><label *ngIf="!demo"
-          ><input type="radio" name="payment" [(ngModel)]="method" value="payfast" /> PayFast
-          sandbox <small>Test payments only</small></label
-        >
-      </div>
-      <p *ngIf="error" class="error-msg">{{error}}</p>
-      <button type="submit" class="btn btn-orange btn-block" [disabled]="busy">
-        {{busy?'Processing…':demo?'Place demo order ↗':'Continue to PayFast sandbox ↗'}}</button
-      ><small class="secure-text">No real payment will be taken from this demo storefront.</small>
+        <div class="form-grid">
+          <label>City / Town<input name="city" [(ngModel)]="delivery.city" required /></label
+          ><label
+            >Province<select name="province" [(ngModel)]="delivery.province">
+              <option>Gauteng</option>
+              <option>Western Cape</option>
+              <option>KwaZulu-Natal</option>
+              <option>Eastern Cape</option>
+              <option>Free State</option>
+              <option>Limpopo</option>
+              <option>Mpumalanga</option>
+              <option>North West</option>
+              <option>Northern Cape</option>
+            </select></label
+          >
+        </div>
+        <label
+          >Postal code<input
+            name="postalCode"
+            [(ngModel)]="delivery.postalCode"
+            required
+            minlength="3"
+        /></label>
+        <h2>Payment method</h2>
+        <div class="payment-choice">
+          <label *ngIf="demo"
+            ><input type="radio" name="payment" [(ngModel)]="method" value="demo" /> Simulated demo
+            payment <small>For testing only — no charge</small></label
+          ><label *ngIf="!demo"
+            ><input type="radio" name="payment" [(ngModel)]="method" value="payfast" /> PayFast
+            sandbox <small>Test payments only</small></label
+          >
+        </div>
+        <p *ngIf="error" class="error-msg">{{error}}</p>
+        <button type="submit" class="btn btn-orange btn-block" [disabled]="busy">
+          {{busy?'Processing…':demo?'Place demo order ↗':'Continue to PayFast sandbox ↗'}}</button
+        ><small class="secure-text">No real payment will be taken from this demo storefront.</small>
+      </fieldset>
     </form>
   </div>
   <ng-template #signInFirst

@@ -1127,6 +1127,13 @@ main {
   margin-bottom: 28px;
 }
 .auth-card label,
+/* Locked while saved addresses load, so typing is never replaced by the pre-filled address. */
+.checkout-fields {
+  border: 0;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
 .checkout-form label,
 .admin-editor label {
   display: block;
