@@ -59,8 +59,23 @@ export class AdminPage implements OnInit, OnDestroy {
   imageError = '';
   notes = '';
   generating = false;
+  /** Whether the server has an AI key (from /api/meta); null until known, and then nothing is blocked. */
+  aiEnabled: boolean | null = null;
+  /** Drafting needs a few real words to work from; spaces do not count. */
+  get hasNotes() {
+    return this.notes.trim().length >= 5;
+  }
+  /** Why Generate listing is unavailable, or '' when it is ready to use. */
+  get aiHint() {
+    if (this.aiEnabled === false)
+      return "AI drafting isn't set up on the server yet. Add a GEMINI_API_KEY or GROQ_API_KEY in your Render environment settings.";
+    return this.hasNotes ? '' : 'Type at least 5 characters about your product to enable drafting.';
+  }
   ngOnInit() {
-    if (this.store.user()?.role === 'admin') this.refresh();
+    if (this.store.user()?.role === 'admin') {
+      this.refresh();
+      this.api.meta().subscribe({ next: (meta) => (this.aiEnabled = meta.aiEnabled) });
+    }
   }
   refresh() {
     this.http

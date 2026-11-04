@@ -1537,6 +1537,12 @@ main {
   line-height: 1.7;
   color: var(--muted);
 }
+.ai-editor .ai-hint {
+  display: block;
+  margin-bottom: 8px;
+  color: #8a4b1f;
+  font-weight: 600;
+}
 .ai-editor textarea {
   width: 100%;
   resize: vertical;
