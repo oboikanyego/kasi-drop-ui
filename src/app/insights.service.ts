@@ -8,7 +8,8 @@ export type AnalyticsEvent =
   | 'add_to_cart'
   | 'checkout_started'
   | 'checkout_created'
-  | 'api_error';
+  | 'api_error'
+  | 'product_view';
 export type AnalyticsPage =
   | 'home'
   | 'shop'
@@ -25,9 +26,9 @@ export type AnalyticsPage =
 @Injectable({ providedIn: 'root' })
 export class InsightsService {
   private readonly http = inject(HttpClient);
-  track(name: AnalyticsEvent, page?: AnalyticsPage): void {
+  track(name: AnalyticsEvent, page?: AnalyticsPage, productId?: string): void {
     // Analytics must never block shopping or expose queries, prompts or customer data.
-    this.http.post('/api/analytics/events', { name, page }).subscribe({ error: () => {} });
+    this.http.post('/api/analytics/events', { name, page, ...(productId ? { productId } : {}) }).subscribe({ error: () => {} });
   }
   sendFeedback(data: {
     category: 'bug' | 'idea' | 'experience' | 'other';
