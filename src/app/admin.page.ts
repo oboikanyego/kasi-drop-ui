@@ -93,6 +93,7 @@ export class AdminPage implements OnInit, OnDestroy {
         periodDays: number;
         counts: Record<string, number>;
         checkoutConversion: number;
+        checkoutOrders: number;
         confirmedPayments: number;
         paymentConversion: number;
         note: string;
