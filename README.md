@@ -77,3 +77,7 @@ The **Admin → Insights & Feedback** tab shows 30-day anonymous event counts, c
 ## Hide discontinued products
 
 **Admin → Inventory** now includes a visibility status and **Hide from store / Show in store** controls. Hidden products remain in the admin catalogue and can be restored without losing their information. Filter visible/hidden items and navigate pages. Shoppers no longer see hidden products in searches, details, recommendations or AI suggestions, and cannot check out with a hidden item from an old cart.
+
+## Shop budget range picker
+
+The shop now has touch-friendly minimum/maximum budget sliders and editable Rand amount fields (R0–R5,000+, with an open upper end at the slider maximum). Products update when an amount is selected. Filters also work in offline read-only catalogue preview. Clear filters resets the budget range.
