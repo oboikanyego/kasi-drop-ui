@@ -36,7 +36,7 @@
       </label>
       <div class="budget-trigger-wrap">
         <span class="budget-tool-label">Budget</span>
-        <button type="button" class="budget-trigger" [class.is-active]="budgetApplied"
+        <button #budgetTrigger type="button" class="budget-trigger" [class.is-active]="budgetApplied"
           [attr.aria-expanded]="budgetOpen" aria-controls="budget-panel" aria-haspopup="dialog"
           (click)="budgetOpen ? closeBudget() : openBudget()">
           <ion-icon name="options-outline" aria-hidden="true"></ion-icon>
@@ -46,7 +46,7 @@
         <ng-container *ngIf="budgetOpen">
           <button type="button" class="budget-backdrop" aria-label="Close budget filter"
             (click)="closeBudget()"></button>
-          <section class="budget-range-filter" id="budget-panel" role="dialog" aria-modal="true"
+          <section #budgetDialog tabindex="-1" class="budget-range-filter" id="budget-panel" role="dialog" aria-modal="true"
             aria-label="Choose a budget range">
             <header class="budget-panel-head">
               <div>
