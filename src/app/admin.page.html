@@ -31,7 +31,14 @@
         ><strong>{{(summary?.revenue||0)|currency:'ZAR':'symbol-narrow':'1.0-0'}}</strong>
       </div>
     </div>
-    <div *ngIf="paymentReadiness" class="admin-deployment"><h2>Deployment &amp; payment readiness</h2><p><strong>Real payments:</strong> {{paymentReadiness.acceptsRealPayments ? 'Enabled' : 'Not enabled (sandbox only)'}} · <strong>Storage:</strong> {{paymentReadiness.imageStorage}}</p><p *ngFor="let issue of paymentReadiness.issues">{{issue}}</p></div>
+    <div *ngIf="paymentReadiness" class="admin-deployment">
+      <h2>Deployment &amp; payment readiness</h2>
+      <p>
+        <strong>Real payments:</strong> {{paymentReadiness.acceptsRealPayments ? 'Enabled' : 'Not
+        enabled (sandbox only)'}} · <strong>Storage:</strong> {{paymentReadiness.imageStorage}}
+      </p>
+      <p *ngFor="let issue of paymentReadiness.issues">{{issue}}</p>
+    </div>
     <h2>Recent orders</h2>
     <div class="table-wrap">
       <table>
@@ -88,15 +95,32 @@
         <small>Checkout creation rate</small
         ><strong>{{analytics?.checkoutConversion || 0}}%</strong>
       </div>
-      <div><small>PayFast orders created</small><strong>{{analytics?.checkoutOrders || 0}}</strong></div><div><small>Verified payments</small><strong>{{analytics?.confirmedPayments || 0}}</strong></div>
-      <div><small>Verified payment / PayFast order ratio</small><strong>{{analytics?.paymentConversion || 0}}%</strong></div>
+      <div>
+        <small>PayFast orders created</small><strong>{{analytics?.checkoutOrders || 0}}</strong>
+      </div>
+      <div>
+        <small>Verified payments</small><strong>{{analytics?.confirmedPayments || 0}}</strong>
+      </div>
+      <div>
+        <small>Verified payment / PayFast order ratio</small
+        ><strong>{{analytics?.paymentConversion || 0}}%</strong>
+      </div>
       <div>
         <small>API server errors (5xx)</small
         ><strong>{{analytics?.counts?.['api_error'] || 0}}</strong>
       </div>
     </div>
     <h2>Early tester feedback</h2>
-    <label class="admin-feedback-filter">Filter by status <select [(ngModel)]="feedbackFilter" aria-label="Filter feedback by status"><option value="all">All</option><option value="new">New</option><option value="in_review">In review</option><option value="resolved">Resolved</option><option value="closed">Closed</option></select></label>
+    <label class="admin-feedback-filter"
+      >Filter by status
+      <select [(ngModel)]="feedbackFilter" aria-label="Filter feedback by status">
+        <option value="all">All</option>
+        <option value="new">New</option>
+        <option value="in_review">In review</option>
+        <option value="resolved">Resolved</option>
+        <option value="closed">Closed</option>
+      </select></label
+    >
     <p *ngIf="!feedback.length">No feedback received yet.</p>
     <div class="table-wrap" *ngIf="feedback.length">
       <table>
@@ -113,7 +137,19 @@
             <td>{{item.createdAt | date:'mediumDate'}}</td>
             <td>{{item.category}}</td>
             <td>{{item.rating || '—'}}</td>
-            <td style="white-space: pre-wrap; overflow-wrap: anywhere">{{item.message}}</td><td><select [ngModel]="item.status" (ngModelChange)="updateFeedback(item, $event)" aria-label="Feedback status"><option value="new">New</option><option value="in_review">In review</option><option value="resolved">Resolved</option><option value="closed">Closed</option></select></td>
+            <td style="white-space: pre-wrap; overflow-wrap: anywhere">{{item.message}}</td>
+            <td>
+              <select
+                [ngModel]="item.status"
+                (ngModelChange)="updateFeedback(item, $event)"
+                aria-label="Feedback status"
+              >
+                <option value="new">New</option>
+                <option value="in_review">In review</option>
+                <option value="resolved">Resolved</option>
+                <option value="closed">Closed</option>
+              </select>
+            </td>
           </tr>
         </tbody>
       </table>

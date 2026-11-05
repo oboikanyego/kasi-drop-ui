@@ -12,8 +12,14 @@ import { InsightsService } from './insights.service';
       <div class="feedback-intro">
         <span class="feedback-kicker">Your voice matters</span>
         <h1>Help shape the next KasiDrop.</h1>
-        <p>We are building a better way to shop local in South Africa. What worked well, and what could be better?</p>
-        <p>Tell us about your experience. Please do not share passwords, phone numbers, delivery addresses or payment information.</p>
+        <p>
+          We are building a better way to shop local in South Africa. What worked well, and what
+          could be better?
+        </p>
+        <p>
+          Tell us about your experience. Please do not share passwords, phone numbers, delivery
+          addresses or payment information.
+        </p>
       </div>
       <section class="feedback-card" aria-labelledby="feedback-title">
         <h2 id="feedback-title">Share your feedback</h2>
@@ -36,15 +42,36 @@ import { InsightsService } from './insights.service';
           </label>
           <label class="feedback-field" for="message">
             <span>Your feedback</span>
-            <textarea id="message" name="message" [(ngModel)]="message" #messageControl="ngModel" required minlength="10" maxlength="1500"
-              placeholder="Tell us what you liked or what we could improve..." rows="6"></textarea>
+            <textarea
+              id="message"
+              name="message"
+              [(ngModel)]="message"
+              #messageControl="ngModel"
+              required
+              minlength="10"
+              maxlength="1500"
+              placeholder="Tell us what you liked or what we could improve..."
+              rows="6"
+            ></textarea>
             <small class="feedback-hint">{{ message.length }} / 1500 characters · Minimum 10</small>
           </label>
-          <button class="feedback-submit" type="submit" [disabled]="busy || feedbackForm.invalid || message.trim().length < 10">
+          <button
+            class="feedback-submit"
+            type="submit"
+            [disabled]="busy || feedbackForm.invalid || message.trim().length < 10"
+          >
             {{ busy ? 'Sending your feedback…' : 'Send feedback' }}
           </button>
         </form>
-        <p *ngIf="result" class="feedback-result" [class.error]="failed" role="status" aria-live="polite">{{ result }}</p>
+        <p
+          *ngIf="result"
+          class="feedback-result"
+          [class.error]="failed"
+          role="status"
+          aria-live="polite"
+        >
+          {{ result }}
+        </p>
       </section>
     </div>
   `,
@@ -62,9 +89,20 @@ export class FeedbackPage {
     this.busy = true;
     this.failed = false;
     this.result = '';
-    this.insights.sendFeedback({ category: this.category, rating: this.rating, message: this.message.trim() }).subscribe({
-      next: () => { this.result = 'Thank you! Your feedback has been received.'; this.message = ''; this.rating = undefined; this.busy = false; },
-      error: () => { this.failed = true; this.result = 'We could not send your feedback. Please try again.'; this.busy = false; },
-    });
+    this.insights
+      .sendFeedback({ category: this.category, rating: this.rating, message: this.message.trim() })
+      .subscribe({
+        next: () => {
+          this.result = 'Thank you! Your feedback has been received.';
+          this.message = '';
+          this.rating = undefined;
+          this.busy = false;
+        },
+        error: () => {
+          this.failed = true;
+          this.result = 'We could not send your feedback. Please try again.';
+          this.busy = false;
+        },
+      });
   }
 }

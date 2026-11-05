@@ -27,7 +27,9 @@ export class HomePage implements OnInit {
     this.reload();
   }
   reload() {
-    this.http.get<{products:Product[]}>('/api/recommendations').subscribe({ next: r => this.trending = r.products, error: () => this.trending = [] });
+    this.http
+      .get<{ products: Product[] }>('/api/recommendations')
+      .subscribe({ next: (r) => (this.trending = r.products), error: () => (this.trending = []) });
     this.loading = true;
     this.error = '';
     this.api.getProducts().subscribe({

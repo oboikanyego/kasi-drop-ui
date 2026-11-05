@@ -28,7 +28,9 @@ export class InsightsService {
   private readonly http = inject(HttpClient);
   track(name: AnalyticsEvent, page?: AnalyticsPage, productId?: string): void {
     // Analytics must never block shopping or expose queries, prompts or customer data.
-    this.http.post('/api/analytics/events', { name, page, ...(productId ? { productId } : {}) }).subscribe({ error: () => {} });
+    this.http
+      .post('/api/analytics/events', { name, page, ...(productId ? { productId } : {}) })
+      .subscribe({ error: () => {} });
   }
   sendFeedback(data: {
     category: 'bug' | 'idea' | 'experience' | 'other';
