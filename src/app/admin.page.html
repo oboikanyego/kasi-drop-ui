@@ -10,7 +10,7 @@
     <button [class.active]="tab==='overview'" (click)="tab='overview'">Overview</button
     ><button [class.active]="tab==='products'" (click)="tab='products'">Inventory</button
     ><button [class.active]="tab==='orders'" (click)="tab='orders'">Orders</button
-    ><button [class.active]="tab==='add'" (click)="tab='add'"(click)="newProduct()">+ Add product</button
+    ><button [class.active]="tab==='add'" (click)="newProduct()">+ Add product</button
     ><button [class.active]="tab==='insights'" (click)="tab='insights';refresh()">
       Insights &amp; Feedback
     </button>
@@ -343,7 +343,7 @@
           <div class="photo-row">
             <div class="photo-preview">
               <img *ngIf="imagePreview || form.image" [src]="imagePreview || form.image" alt="Current product photo" />
-              <span *ngIf="!imagePreview">{{uploadingImage?'Uploading…':'No photo yet'}}</span>
+              <span *ngIf="!imagePreview && !form.image">{{uploadingImage?'Uploading…':'No photo yet'}}</span>
             </div>
             <div class="photo-actions">
               <label class="btn btn-outline photo-pick">
@@ -374,7 +374,7 @@
           ><input name="featured" type="checkbox" [(ngModel)]="form.featured" /> Feature on
           homepage</label>
         <label class="checkbox-field" *ngIf="editingProduct"><input name="active" type="checkbox" [(ngModel)]="form.active" /> Visible in store</label>
-        ><button
+        <button
           class="btn btn-orange"
           type="submit"
           [disabled]="busy||uploadingImage||!form.image||productForm.invalid"
