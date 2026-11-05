@@ -109,6 +109,11 @@
     </div>
   </section>
 
+  <section class="featured-section" aria-labelledby="trending-heading" *ngIf="trending.length">
+    <div class="section-title-row"><h2 id="trending-heading">Trending on KasiDrop</h2><a routerLink="/shop">Explore more</a></div>
+    <p class="section-description">Popular local finds based on anonymous browsing and cart activity. No personalised tracking.</p>
+    <app-product-grid [products]="trending"></app-product-grid>
+  </section>
   <section class="local-note">
     <div class="local-note-copy">
       <span>MADE HERE. LOVED EVERYWHERE.</span>
