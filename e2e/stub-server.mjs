@@ -226,6 +226,7 @@ async function api(req, res, path, search = '') {
       },
     });
   if (route === 'POST /api/orders/checkout') {
+    if (body.items.some(item => !state.products.some(product => product.id === item.productId && product.active))) return send(res, 400, { error: 'Product no longer available' });
     if (body.paymentMethod === 'demo') {
       const order = newOrder(body, 'demo_paid');
       return send(res, 201, {
