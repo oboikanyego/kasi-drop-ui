@@ -137,7 +137,9 @@ export class AdminPage implements OnInit, OnDestroy {
   notice = '';
   form = blankForm();
   editingProductId: string | null = null;
-  get editingProduct() { return this.editingProductId !== null; }
+  get editingProduct() {
+    return this.editingProductId !== null;
+  }
   editProduct(product: Product) {
     this.error = '';
     this.notice = '';

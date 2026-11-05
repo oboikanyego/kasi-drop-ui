@@ -118,7 +118,9 @@ test('admin edits an existing product and keeps the original id', async ({ page,
   await expect(form.locator('input[name=price]')).toHaveValue('219');
   await expect(form.locator('.photo-preview img')).toBeVisible();
   await form.locator('input[name=name]').fill('African Sunrise Candle – Large');
-  await form.locator('textarea[name=description]').fill('A large South African soy candle with warm citrus notes.');
+  await form
+    .locator('textarea[name=description]')
+    .fill('A large South African soy candle with warm citrus notes.');
   await form.locator('select[name=category]').selectOption('Crafts');
   await form.locator('input[name=price]').fill('259.95');
   await form.locator('input[name=stock]').fill('7');
@@ -129,9 +131,12 @@ test('admin edits an existing product and keeps the original id', async ({ page,
 
   await expect(page.locator('.success-msg')).toContainText('Product updated successfully');
   await expect(page.getByRole('heading', { name: 'Manage products' })).toBeVisible();
-  const patch = (await adminCalls(stub)).find((request) =>
-    request.method === 'PATCH' && request.path === '/api/admin/products/candle'
-    && request.body?.name === 'African Sunrise Candle – Large');
+  const patch = (await adminCalls(stub)).find(
+    (request) =>
+      request.method === 'PATCH' &&
+      request.path === '/api/admin/products/candle' &&
+      request.body?.name === 'African Sunrise Candle – Large',
+  );
   expect(patch).toBeTruthy();
   expect(patch.body).toMatchObject({
     name: 'African Sunrise Candle – Large',
@@ -144,8 +149,14 @@ test('admin edits an existing product and keeps the original id', async ({ page,
     active: false,
     image: '/assets/x.webp',
   });
-  await expect(page.locator('tbody tr', { hasText: 'African Sunrise Candle – Large' })).toContainText('Hidden');
-  expect((await adminCalls(stub)).filter((request) => request.path === '/api/admin/products' && request.method === 'POST')).toHaveLength(0);
+  await expect(
+    page.locator('tbody tr', { hasText: 'African Sunrise Candle – Large' }),
+  ).toContainText('Hidden');
+  expect(
+    (await adminCalls(stub)).filter(
+      (request) => request.path === '/api/admin/products' && request.method === 'POST',
+    ),
+  ).toHaveLength(0);
 });
 
 test('admin can replace photo on an existing listing', async ({ page, stub }) => {
@@ -163,8 +174,9 @@ test('admin can replace photo on an existing listing', async ({ page, stub }) =>
   await expect(form.locator('.photo-preview img')).toHaveAttribute('src', /^blob:/);
   await form.getByRole('button', { name: 'Save changes' }).click();
   await expect(page.locator('.success-msg')).toContainText('Product updated successfully');
-  const patch = (await adminCalls(stub)).find((request) =>
-    request.method === 'PATCH' && request.path === '/api/admin/products/candle');
+  const patch = (await adminCalls(stub)).find(
+    (request) => request.method === 'PATCH' && request.path === '/api/admin/products/candle',
+  );
   expect(patch.body.image).toBe('/api/images/img-1');
 });
 
@@ -179,5 +191,9 @@ test('cancel editing preserves the original product', async ({ page, stub }) => 
   await page.getByRole('button', { name: 'Cancel editing' }).click();
   await expect(page.getByRole('heading', { name: 'Manage products' })).toBeVisible();
   await expect(page.locator('tbody tr', { hasText: 'African Sunrise Soy Candle' })).toBeVisible();
-  expect((await adminCalls(stub)).some(request => request.method === 'PATCH' && request.path === '/api/admin/products/candle')).toBe(false);
+  expect(
+    (await adminCalls(stub)).some(
+      (request) => request.method === 'PATCH' && request.path === '/api/admin/products/candle',
+    ),
+  ).toBe(false);
 });
