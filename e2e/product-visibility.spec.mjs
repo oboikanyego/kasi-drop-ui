@@ -1,4 +1,4 @@
-import { test, expect, seed, admin, customer, line } from './fixtures.mjs';
+import { test, expect, seed, admin } from './fixtures.mjs';
 
 test('admin can hide discontinued product and restore it later', async ({ page, stub }) => {
   await stub.reset();
