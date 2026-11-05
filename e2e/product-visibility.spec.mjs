@@ -47,6 +47,7 @@ test('hidden product cannot be purchased from previously saved cart', async ({ p
   await page.getByRole('button', { name: 'Hide African Sunrise Soy Candle from store' }).click();
   // Even an old cart cannot override server-side product visibility.
   const response = await page.request.post('/api/orders/checkout', {
+    headers: { 'X-KasiDrop-CSRF': '1' },
     data: {
       items: [{ productId: 'candle', quantity: 1 }],
       paymentMethod: 'demo',
