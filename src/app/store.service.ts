@@ -521,9 +521,21 @@ export class ApiService {
       recentOrders: Order[];
     }>(this.base + '/admin/summary');
   }
-  adminProducts(page = 1) {
+  adminProducts(filters: {
+    page?: number;
+    q?: string;
+    visibility?: string;
+    category?: string;
+    stock?: string;
+    featured?: string;
+    sort?: string;
+  } = {}) {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(filters)) {
+      if (value !== undefined && value !== '' && value !== 'all') params.set(key, String(value));
+    }
     return this.http.get<{ products: Product[]; total: number; page: number; pageSize: number }>(
-      this.base + '/admin/products?page=' + encodeURIComponent(String(page)),
+      this.base + '/admin/products?' + params.toString(),
     );
   }
   adminOrders() {
