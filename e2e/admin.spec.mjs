@@ -73,7 +73,9 @@ test('an admin publishes a product with its tags split into a list', async ({ pa
 
   await expect(page.locator('.success-msg')).toHaveText('Product published');
   await expect(page.getByRole('heading', { name: 'Manage products' })).toBeVisible();
-  const created = (await adminCalls(stub)).find((r) => r.path === '/api/admin/products' && r.method === 'POST');
+  const created = (await adminCalls(stub)).find(
+    (r) => r.path === '/api/admin/products' && r.method === 'POST',
+  );
   expect(created.method).toBe('POST');
   expect(created.body).toMatchObject({
     name: 'Beaded Keyring',

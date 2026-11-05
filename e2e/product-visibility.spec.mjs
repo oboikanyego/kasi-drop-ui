@@ -10,8 +10,12 @@ test('admin can hide discontinued product and restore it later', async ({ page, 
   await row.getByRole('button', { name: 'Hide African Sunrise Soy Candle from store' }).click();
   await expect(row).toContainText('Hidden');
   await expect(page.locator('.success-msg')).toContainText('hidden from shoppers');
-  const hideRequest = (await stub.requests()).find(request =>
-    request.method === 'PATCH' && request.path === '/api/admin/products/candle' && request.body?.active === false);
+  const hideRequest = (await stub.requests()).find(
+    (request) =>
+      request.method === 'PATCH' &&
+      request.path === '/api/admin/products/candle' &&
+      request.body?.active === false,
+  );
   expect(hideRequest).toBeTruthy();
 
   await page.getByLabel('Filter products by visibility').selectOption('hidden');
@@ -20,18 +24,27 @@ test('admin can hide discontinued product and restore it later', async ({ page, 
   await expect(row).toBeHidden();
   await page.getByLabel('Filter products by visibility').selectOption('active');
   await expect(row).toContainText('Visible');
-  const restoreRequest = (await stub.requests()).find(request =>
-    request.method === 'PATCH' && request.path === '/api/admin/products/candle' && request.body?.active === true);
+  const restoreRequest = (await stub.requests()).find(
+    (request) =>
+      request.method === 'PATCH' &&
+      request.path === '/api/admin/products/candle' &&
+      request.body?.active === true,
+  );
   expect(restoreRequest).toBeTruthy();
 });
 
-test('hidden product disappears from public catalogue and product detail', async ({ page, stub }) => {
+test('hidden product disappears from public catalogue and product detail', async ({
+  page,
+  stub,
+}) => {
   await stub.reset();
   await seed(page, { user: admin });
   await page.goto('/admin');
   await page.getByRole('button', { name: 'Inventory' }).click();
   await page.getByRole('button', { name: 'Hide African Sunrise Soy Candle from store' }).click();
-  await expect(page.locator('tbody tr', { hasText: 'African Sunrise Soy Candle' })).toContainText('Hidden');
+  await expect(page.locator('tbody tr', { hasText: 'African Sunrise Soy Candle' })).toContainText(
+    'Hidden',
+  );
 
   await page.goto('/shop');
   await expect(page.getByText('African Sunrise Soy Candle')).toHaveCount(0);
@@ -51,7 +64,14 @@ test('hidden product cannot be purchased from previously saved cart', async ({ p
     data: {
       items: [{ productId: 'candle', quantity: 1 }],
       paymentMethod: 'demo',
-      delivery: { name: 'Tester', phone: '0821111111', address: '123 Main Road', city: 'Johannesburg', province: 'Gauteng', postalCode: '2000' }
+      delivery: {
+        name: 'Tester',
+        phone: '0821111111',
+        address: '123 Main Road',
+        city: 'Johannesburg',
+        province: 'Gauteng',
+        postalCode: '2000',
+      },
     },
   });
   expect(response.status()).toBe(400);

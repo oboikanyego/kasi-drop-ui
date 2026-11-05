@@ -60,7 +60,9 @@ test('a big photo is shrunk, uploaded and previewed, and its path is what gets p
 
   await publish(form).click();
   await expect(page.locator('.success-msg')).toHaveText('Product published');
-  const created = (await stub.requests()).find((r) => r.path === '/api/admin/products' && r.method === 'POST');
+  const created = (await stub.requests()).find(
+    (r) => r.path === '/api/admin/products' && r.method === 'POST',
+  );
   expect(created.body.image).toBe('/api/images/img-1');
 });
 

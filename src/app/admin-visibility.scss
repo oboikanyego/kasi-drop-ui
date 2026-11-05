@@ -1,15 +1,70 @@
-.inventory-filter { display:flex; align-items:center; gap:.75rem; margin:1rem 0; font-weight:700; }
-.inventory-filter select { min-height:42px; border:1px solid #bac4bf; border-radius:10px; padding:.55rem .8rem; background:#fff; color:#17241d; }
-.inventory-visibility { display:inline-block; padding:.4rem .7rem; border-radius:999px; background:#e5f5ec; color:#185738; font-size:.8rem; font-weight:800; white-space:nowrap; }
-.inventory-visibility.is-hidden { background:#f0eee9; color:#5c5449; }
-.inventory-hidden-row { background:#f9f8f5; }
-.inventory-actions { display:flex; flex-wrap:wrap; gap:.5rem; }
-.inventory-actions button { white-space:nowrap; min-height:40px; }
-.inventory-restore { border-color:#327e50; color:#17683c; }
-.inventory-pagination { display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:center; margin:1.25rem 0; }
-@media(max-width:700px) {
-  .inventory-filter { justify-content:space-between; flex-wrap:wrap; }
-  .inventory-filter select { max-width:100%; }
-  .inventory-actions { min-width:125px; flex-direction:column; align-items:stretch; }
-  .inventory-actions button { white-space:normal; }
+.inventory-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  font-weight: 700;
+}
+.inventory-filter select {
+  min-height: 42px;
+  border: 1px solid #bac4bf;
+  border-radius: 10px;
+  padding: 0.55rem 0.8rem;
+  background: #fff;
+  color: #17241d;
+}
+.inventory-visibility {
+  display: inline-block;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  background: #e5f5ec;
+  color: #185738;
+  font-size: 0.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.inventory-visibility.is-hidden {
+  background: #f0eee9;
+  color: #5c5449;
+}
+.inventory-hidden-row {
+  background: #f9f8f5;
+}
+.inventory-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.inventory-actions button {
+  white-space: nowrap;
+  min-height: 40px;
+}
+.inventory-restore {
+  border-color: #327e50;
+  color: #17683c;
+}
+.inventory-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  margin: 1.25rem 0;
+}
+@media (max-width: 700px) {
+  .inventory-filter {
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  .inventory-filter select {
+    max-width: 100%;
+  }
+  .inventory-actions {
+    min-width: 125px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .inventory-actions button {
+    white-space: normal;
+  }
 }

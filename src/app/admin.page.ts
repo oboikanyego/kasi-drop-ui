@@ -88,13 +88,16 @@ export class AdminPage implements OnInit, OnDestroy {
   inventoryPage = 1;
   inventoryTotal = 0;
   inventoryPageSize = 100;
-  get inventoryPageCount() { return Math.ceil(this.inventoryTotal / this.inventoryPageSize); }
+  get inventoryPageCount() {
+    return Math.ceil(this.inventoryTotal / this.inventoryPageSize);
+  }
   inventoryFilter: 'all' | 'active' | 'hidden' = 'all';
   inventorySaving = new Set<string>();
   get visibleInventory() {
-    return this.products.filter((product) =>
-      this.inventoryFilter === 'all' ||
-      (this.inventoryFilter === 'active' ? product.active : !product.active),
+    return this.products.filter(
+      (product) =>
+        this.inventoryFilter === 'all' ||
+        (this.inventoryFilter === 'active' ? product.active : !product.active),
     );
   }
   loadInventory(page = this.inventoryPage) {
@@ -116,9 +119,11 @@ export class AdminPage implements OnInit, OnDestroy {
     this.api.updateProduct(product.id, { active }).subscribe({
       next: ({ product: updated }) => {
         product.active = updated.active;
-        this.notice = updated.active ? updated.name + ' is visible in the shop.' : updated.name + ' is hidden from shoppers.';
+        this.notice = updated.active
+          ? updated.name + ' is visible in the shop.'
+          : updated.name + ' is hidden from shoppers.';
         this.inventorySaving.delete(product.id);
-        this.api.adminSummary().subscribe({ next: summary => this.summary = summary });
+        this.api.adminSummary().subscribe({ next: (summary) => (this.summary = summary) });
       },
       error: (e) => {
         this.inventorySaving.delete(product.id);
