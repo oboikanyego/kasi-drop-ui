@@ -64,3 +64,12 @@ The app anonymously records broad page views, catalogue searches (without query 
 Customers can share feedback at **`/feedback`**. The form supports bug reports, suggestions and shopping-experience feedback with an optional 1–5 rating. Submissions go to `POST /api/feedback`.
 
 The **Admin → Insights & Feedback** tab shows 30-day anonymous event counts, checkout creation/start percentage, HTTP 5xx event counts and recent tester feedback. These are **not unique visitor numbers or confirmed payment conversions**. The admin routes require authenticated admin access.
+
+## Launch improvements (November 2026)
+
+- A polished, accessible, responsive `/feedback` form lets early customers submit experience feedback, ideas and bug reports.
+- Admin → Insights & Feedback now supports triage statuses (`new`, `in_review`, `resolved`, `closed`) and status filtering.
+- The admin reports **verified payments / PayFast orders created** (server-owned checkout cohort) independently from anonymous frontend checkout counts; these are not interchangeable.
+- Admin overview shows deployment readiness diagnostics. Live payments remain **disabled**; only the sandbox gateway is implemented.
+- The homepage features a trending-products section driven by 30-day anonymous product views and add-to-cart aggregates. There is no user identity tracking or personalised profile.
+- The API has an optional Cloudflare R2 storage backend configured entirely through Render environment values. See API README for the staged migration procedure; do not add secrets to Netlify.
