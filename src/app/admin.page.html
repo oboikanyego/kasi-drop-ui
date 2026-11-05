@@ -203,7 +203,7 @@
     </div>
     <div class="inventory-pagination" *ngIf="inventoryTotal > inventoryPageSize">
       <button type="button" class="small-action" [disabled]="inventoryPage <= 1" (click)="loadInventory(inventoryPage - 1)">Previous</button>
-      <span>Page {{inventoryPage}} of {{(inventoryTotal / inventoryPageSize) | number:'1.0-0'}} · {{inventoryTotal}} products</span>
+      <span>Page {{inventoryPage}} of {{inventoryPageCount}} · {{inventoryTotal}} products</span>
       <button type="button" class="small-action" [disabled]="inventoryPage * inventoryPageSize >= inventoryTotal" (click)="loadInventory(inventoryPage + 1)">Next</button>
     </div>
   </div>
