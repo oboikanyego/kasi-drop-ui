@@ -54,6 +54,7 @@ export class HomePage implements OnInit {
   standalone: true,
   imports: [CommonModule, RouterLink, ProductGridComponent, FormsModule, IonIcon],
   templateUrl: './shop.page.html',
+  styleUrls: ['./budget-range.scss'],
 })
 export class ShopPage implements OnInit {
   readonly api = inject(ApiService);
