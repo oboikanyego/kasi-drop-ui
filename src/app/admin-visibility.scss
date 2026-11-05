@@ -68,3 +68,16 @@
     white-space: normal;
   }
 }
+
+/* Editing keeps the existing product identity and uses the same mobile-friendly listing form. */
+.inventory-actions .inventory-edit {
+  border-color: #225b40;
+  background: #eaf5ed;
+  color: #1c5a3c;
+  font-weight: 750;
+}
+.inventory-actions .inventory-edit:hover { background: #d8ebdd; }
+.inventory-cancel { margin-left: 0.65rem; }
+@media (max-width: 700px) {
+  .inventory-cancel { display: block; width: 100%; margin: 0.75rem 0 0; }
+}

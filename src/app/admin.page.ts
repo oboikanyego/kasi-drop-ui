@@ -136,6 +136,43 @@ export class AdminPage implements OnInit, OnDestroy {
   error = '';
   notice = '';
   form = blankForm();
+  editingProductId: string | null = null;
+  get editingProduct() { return this.editingProductId !== null; }
+  editProduct(product: Product) {
+    this.error = '';
+    this.notice = '';
+    this.editingProductId = product.id;
+    this.form = {
+      name: product.name,
+      description: product.description,
+      category: product.category,
+      price: product.price,
+      stock: product.stock,
+      image: product.image,
+      tags: product.tags.join(', '),
+      featured: product.featured,
+      active: product.active,
+    };
+    this.setImage(product.image, null);
+    this.notes = '';
+    this.imageError = '';
+    this.tab = 'add';
+  }
+  newProduct() {
+    if (this.busy || this.uploadingImage) return;
+    this.editingProductId = null;
+    this.form = blankForm();
+    this.setImage('', null);
+    this.notes = '';
+    this.imageError = '';
+    this.error = '';
+    this.tab = 'add';
+  }
+  cancelEdit() {
+    if (this.busy || this.uploadingImage) return;
+    this.newProduct();
+    this.tab = 'products';
+  }
   /** Browser-local preview of the chosen photo (an object URL, released when replaced). */
   imagePreview: string | null = null;
   uploadingImage = false;
@@ -230,32 +267,36 @@ export class AdminPage implements OnInit, OnDestroy {
     });
   }
   add() {
+    if (this.busy || this.uploadingImage || !this.form.image) return;
     this.busy = true;
     this.error = '';
-    this.api
-      .createProduct({
-        ...this.form,
-        tags: this.form.tags
-          .split(',')
-          .map((x) => x.trim())
-          .filter(Boolean),
-      })
-      .subscribe({
-        next: () => {
-          this.busy = false;
-          this.notice = 'Product published';
-          // Start the next product from scratch rather than reusing this one's photo and text.
-          this.form = blankForm();
-          this.notes = '';
-          this.setImage('', null);
-          this.tab = 'products';
-          this.refresh();
-        },
-        error: (e) => {
-          this.busy = false;
-          this.error = e.error?.error || 'Could not save product';
-        },
-      });
+    const productId = this.editingProductId;
+    const input = {
+      ...this.form,
+      tags: this.form.tags
+        .split(',')
+        .map((x) => x.trim())
+        .filter(Boolean),
+    };
+    const request = productId
+      ? this.api.updateProduct(productId, input)
+      : this.api.createProduct(input);
+    request.subscribe({
+      next: () => {
+        this.busy = false;
+        this.notice = productId ? 'Product updated successfully' : 'Product published';
+        this.editingProductId = null;
+        this.form = blankForm();
+        this.notes = '';
+        this.setImage('', null);
+        this.tab = 'products';
+        this.refresh();
+      },
+      error: (e) => {
+        this.busy = false;
+        this.error = e.error?.error || 'Could not save product. Please try again.';
+      },
+    });
   }
   async chooseImage(event: Event) {
     const input = event.target as HTMLInputElement;
