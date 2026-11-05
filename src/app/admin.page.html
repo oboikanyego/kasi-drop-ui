@@ -88,8 +88,8 @@
         <small>Checkout creation rate</small
         ><strong>{{analytics?.checkoutConversion || 0}}%</strong>
       </div>
-      <div><small>Verified payments</small><strong>{{analytics?.confirmedPayments || 0}}</strong></div>
-      <div><small>Verified-payment / checkout-start ratio</small><strong>{{analytics?.paymentConversion || 0}}%</strong></div>
+      <div><small>PayFast orders created</small><strong>{{analytics?.checkoutOrders || 0}}</strong></div><div><small>Verified payments</small><strong>{{analytics?.confirmedPayments || 0}}</strong></div>
+      <div><small>Verified payment / PayFast order ratio</small><strong>{{analytics?.paymentConversion || 0}}%</strong></div>
       <div>
         <small>API server errors (5xx)</small
         ><strong>{{analytics?.counts?.['api_error'] || 0}}</strong>
