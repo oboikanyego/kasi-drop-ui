@@ -168,6 +168,7 @@ export function searchPreview(query = ''): Product[] {
   const params = new URLSearchParams(query.startsWith('?') ? query.slice(1) : query);
   const q = (params.get('q') || '').trim().toLowerCase();
   const category = params.get('category') || 'All';
+  const minPrice = Number(params.get('minPrice') || 0);
   const maxPrice = Number(params.get('maxPrice') || 0);
   const sort = params.get('sort') || 'featured';
   const expansions: Record<string, string[]> = {
@@ -184,6 +185,7 @@ export function searchPreview(query = ''): Product[] {
     (p) =>
       p.active &&
       (category === 'All' || p.category === category) &&
+      (p.price >= minPrice) &&
       (!maxPrice || p.price <= maxPrice) &&
       (!terms.length ||
         terms.some((t) =>
