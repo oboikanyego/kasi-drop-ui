@@ -92,23 +92,55 @@ export class AdminPage implements OnInit, OnDestroy {
     return Math.ceil(this.inventoryTotal / this.inventoryPageSize);
   }
   inventoryFilter: 'all' | 'active' | 'hidden' = 'all';
+  inventorySearch = '';
+  appliedInventorySearch = '';
+  inventoryCategory = 'all';
+  inventoryStock = 'all';
+  inventoryFeatured = 'all';
+  inventorySort = 'newest';
+  inventoryLoading = false;
+  private inventoryRequest = 0;
   inventorySaving = new Set<string>();
-  get visibleInventory() {
-    return this.products.filter(
-      (product) =>
-        this.inventoryFilter === 'all' ||
-        (this.inventoryFilter === 'active' ? product.active : !product.active),
-    );
+  get visibleInventory() { return this.products; }
+  searchInventory() {
+    this.appliedInventorySearch = this.inventorySearch.trim();
+    this.loadInventory(1);
+  }
+  clearInventoryFilters() {
+    this.inventorySearch = '';
+    this.appliedInventorySearch = '';
+    this.inventoryFilter = 'all';
+    this.inventoryCategory = 'all';
+    this.inventoryStock = 'all';
+    this.inventoryFeatured = 'all';
+    this.inventorySort = 'newest';
+    this.loadInventory(1);
   }
   loadInventory(page = this.inventoryPage) {
-    this.api.adminProducts(page).subscribe({
+    const requestId = ++this.inventoryRequest;
+    this.inventoryLoading = true;
+    this.api.adminProducts({
+      page,
+      q: this.appliedInventorySearch,
+      visibility: this.inventoryFilter,
+      category: this.inventoryCategory,
+      stock: this.inventoryStock,
+      featured: this.inventoryFeatured,
+      sort: this.inventorySort,
+    }).subscribe({
       next: (result) => {
+        if (requestId !== this.inventoryRequest) return;
         this.products = result.products;
         this.inventoryPage = result.page;
         this.inventoryPageSize = result.pageSize;
         this.inventoryTotal = result.total;
+        this.inventoryLoading = false;
       },
-      error: () => (this.error = 'Could not load inventory.'),
+      error: () => {
+        if (requestId !== this.inventoryRequest) return;
+        this.inventoryLoading = false;
+        this.error = 'Could not load inventory. Please try again.';
+      },
     });
   }
   setProductVisibility(product: Product) {
@@ -124,6 +156,7 @@ export class AdminPage implements OnInit, OnDestroy {
           : updated.name + ' is hidden from shoppers.';
         this.inventorySaving.delete(product.id);
         this.api.adminSummary().subscribe({ next: (summary) => (this.summary = summary) });
+        this.loadInventory();
       },
       error: (e) => {
         this.inventorySaving.delete(product.id);
