@@ -202,11 +202,13 @@ async function api(req, res, path, search = '') {
       checkoutEnabled: true,
       shipping: { freeFrom: 750, fee: 79 },
     });
-  if (route === 'GET /api/products')
-    return send(res, 200, {
-      products: state.products.filter((p) => p.active),
-      total: state.products.filter((p) => p.active).length,
-    });
+  if (route === 'GET /api/products') {
+    const filters = new URLSearchParams(search);
+    const minPrice = Number(filters.get('minPrice') || 0);
+    const maxPrice = Number(filters.get('maxPrice') || 0);
+    const filtered = state.products.filter(p => p.active && p.price >= minPrice && (!maxPrice || p.price <= maxPrice));
+    return send(res, 200, { products: filtered, total: filtered.length });
+  }
   if (route === 'GET /api/admin/products')
     return user?.role === 'admin'
       ? send(res, 200, {
