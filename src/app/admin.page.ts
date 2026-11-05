@@ -84,6 +84,46 @@ export class AdminPage implements OnInit, OnDestroy {
     recentOrders: Order[];
   };
   products: Product[] = [];
+  inventoryPage = 1;
+  inventoryTotal = 0;
+  inventoryPageSize = 100;
+  inventoryFilter: 'all' | 'active' | 'hidden' = 'all';
+  inventorySaving = new Set<string>();
+  get visibleInventory() {
+    return this.products.filter((product) =>
+      this.inventoryFilter === 'all' ||
+      (this.inventoryFilter === 'active' ? product.active : !product.active),
+    );
+  }
+  loadInventory(page = this.inventoryPage) {
+    this.api.adminProducts(page).subscribe({
+      next: (result) => {
+        this.products = result.products;
+        this.inventoryPage = result.page;
+        this.inventoryPageSize = result.pageSize;
+        this.inventoryTotal = result.total;
+      },
+      error: () => (this.error = 'Could not load inventory.'),
+    });
+  }
+  setProductVisibility(product: Product) {
+    if (this.inventorySaving.has(product.id)) return;
+    const active = !product.active;
+    this.inventorySaving.add(product.id);
+    this.error = '';
+    this.api.updateProduct(product.id, { active }).subscribe({
+      next: ({ product: updated }) => {
+        product.active = updated.active;
+        this.notice = updated.active ? updated.name + ' is visible in the shop.' : updated.name + ' is hidden from shoppers.';
+        this.inventorySaving.delete(product.id);
+        this.api.adminSummary().subscribe({ next: summary => this.summary = summary });
+      },
+      error: (e) => {
+        this.inventorySaving.delete(product.id);
+        this.error = e.error?.error || 'Could not change product visibility. Please try again.';
+      },
+    });
+  }
   orders: Order[] = [];
   busy = false;
   error = '';
@@ -158,7 +198,7 @@ export class AdminPage implements OnInit, OnDestroy {
       next: (r) => (this.summary = r),
       error: () => (this.error = 'Could not load admin summary.'),
     });
-    this.api.getProducts().subscribe({ next: (r) => (this.products = r.products) });
+    this.loadInventory();
     this.api.adminOrders().subscribe({ next: (r) => (this.orders = r.orders) });
   }
   stockChange(p: Product, n: number) {
