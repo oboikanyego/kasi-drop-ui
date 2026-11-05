@@ -22,97 +22,78 @@
       aria-label="Search the catalog"
     /><button type="submit">Search</button>
   </form>
-  <div class="catalogue-categories" role="group" aria-label="Product categories">
-    <button
-      type="button"
-      *ngFor="let c of categories"
-      (click)="setCategory(c)"
-      [class.chosen]="category===c"
-    >
-      {{c}}
-    </button>
-  </div>
   <div class="catalogue-tools">
     <div>
       <h2>{{category==='All'?'All products':category}}</h2>
       <p>{{products.length}} products</p>
     </div>
     <div class="catalogue-selects">
-      <div class="budget-range-filter" role="group" aria-label="Budget range">
-        <span class="budget-range-title">Budget range</span>
-        <div class="budget-range-summary">
-          R{{minPrice | number:'1.0-0'}} – {{maxPrice === budgetCeiling ? 'R' + (maxPrice |
-          number:'1.0-0') + '+' : 'R' + (maxPrice | number:'1.0-0')}}
-        </div>
-        <div class="budget-sliders">
-          <label for="min-budget-range"
-            >Minimum price
-            <input
-              id="min-budget-range"
-              type="range"
-              min="0"
-              [max]="budgetCeiling"
-              step="10"
-              [ngModel]="minPrice"
-              (ngModelChange)="updateBudget('min', $event)"
-              (change)="applyBudget()"
-              [attr.aria-valuetext]="'R' + minPrice"
-            />
-          </label>
-          <label for="max-budget-range"
-            >Maximum price
-            <input
-              id="max-budget-range"
-              type="range"
-              min="0"
-              [max]="budgetCeiling"
-              step="10"
-              [ngModel]="maxPrice"
-              (ngModelChange)="updateBudget('max', $event)"
-              (change)="applyBudget()"
-              [attr.aria-valuetext]="maxPrice === budgetCeiling ? 'R' + maxPrice + ' or more' : 'R' + maxPrice"
-            />
-          </label>
-        </div>
-        <div class="budget-amounts">
-          <label for="min-budget-amount"
-            >From (R)
-            <input
-              id="min-budget-amount"
-              type="number"
-              inputmode="decimal"
-              min="0"
-              [max]="budgetCeiling"
-              step="10"
-              [ngModel]="minPrice"
-              (ngModelChange)="updateBudget('min', $event)"
-              (change)="applyBudget()"
-            />
-          </label>
-          <label for="max-budget-amount"
-            >To (R)
-            <input
-              id="max-budget-amount"
-              type="number"
-              inputmode="decimal"
-              min="0"
-              [max]="budgetCeiling"
-              step="10"
-              [ngModel]="maxPrice"
-              (ngModelChange)="updateBudget('max', $event)"
-              (change)="applyBudget()"
-            />
-          </label>
-        </div>
+      <label class="catalogue-tool-label">
+        <span>Category</span>
+        <select [(ngModel)]="category" (ngModelChange)="load()" aria-label="Filter by category">
+          <option *ngFor="let c of categories" [ngValue]="c">{{c === 'All' ? 'All categories' : c}}</option>
+        </select>
+      </label>
+      <div class="budget-trigger-wrap">
+        <span class="budget-tool-label">Budget</span>
+        <button #budgetTrigger type="button" class="budget-trigger" [class.is-active]="budgetApplied"
+          [attr.aria-expanded]="budgetOpen" aria-controls="budget-panel" aria-haspopup="dialog"
+          (click)="budgetOpen ? closeBudget() : openBudget()">
+          <ion-icon name="options-outline" aria-hidden="true"></ion-icon>
+          <span>{{budgetApplied ? 'R' + (minPrice | number:'1.0-0') + ' – ' + (maxPrice === budgetCeiling ? 'R5,000+' : 'R' + (maxPrice | number:'1.0-0')) : 'Any price'}}</span>
+          <ion-icon name="chevron-down-outline" aria-hidden="true"></ion-icon>
+        </button>
+        <ng-container *ngIf="budgetOpen">
+          <button type="button" class="budget-backdrop" aria-label="Close budget filter"
+            (click)="closeBudget()"></button>
+          <section #budgetDialog tabindex="-1" class="budget-range-filter" id="budget-panel" role="dialog" aria-modal="true"
+            aria-label="Choose a budget range">
+            <header class="budget-panel-head">
+              <div>
+                <span class="budget-range-title">Price range</span>
+                <div class="budget-range-summary">
+                  R{{draftMinPrice | number:'1.0-0'}} – {{draftMaxPrice === budgetCeiling ? 'R5,000+' : 'R' + (draftMaxPrice | number:'1.0-0')}}
+                </div>
+              </div>
+              <button type="button" class="budget-close" aria-label="Close budget filter" (click)="closeBudget()">×</button>
+            </header>
+            <div class="budget-sliders">
+              <label for="min-budget-range">Minimum price
+                <input id="min-budget-range" type="range" min="0" [max]="budgetCeiling" step="10"
+                  [ngModel]="draftMinPrice" (ngModelChange)="updateBudget('min', $event)"
+                  [attr.aria-valuetext]="'R' + draftMinPrice" />
+              </label>
+              <label for="max-budget-range">Maximum price
+                <input id="max-budget-range" type="range" min="0" [max]="budgetCeiling" step="10"
+                  [ngModel]="draftMaxPrice" (ngModelChange)="updateBudget('max', $event)"
+                  [attr.aria-valuetext]="draftMaxPrice === budgetCeiling ? 'R5,000 or more' : 'R' + draftMaxPrice" />
+              </label>
+            </div>
+            <div class="budget-amounts">
+              <label for="min-budget-amount">From (R)
+                <input id="min-budget-amount" type="number" inputmode="decimal" min="0" [max]="budgetCeiling" step="10"
+                  [ngModel]="draftMinPrice" (ngModelChange)="updateBudget('min', $event)" />
+              </label>
+              <label for="max-budget-amount">To (R)
+                <input id="max-budget-amount" type="number" inputmode="decimal" min="0" [max]="budgetCeiling" step="10"
+                  [ngModel]="draftMaxPrice" (ngModelChange)="updateBudget('max', $event)" />
+              </label>
+            </div>
+            <div class="budget-panel-actions">
+              <button type="button" class="budget-clear" (click)="resetBudget()">Reset</button>
+              <button type="button" class="budget-apply" (click)="applyBudget()">Apply range</button>
+            </div>
+          </section>
+        </ng-container>
       </div>
-      <label
-        ><span>Sort</span
-        ><select [(ngModel)]="sort" (change)="load()" aria-label="Sort products">
+      <label class="catalogue-tool-label">
+        <span>Sort</span>
+        <select [(ngModel)]="sort" (change)="load()" aria-label="Sort products">
           <option value="featured">Featured</option>
           <option value="price-asc">Low to high</option>
           <option value="price-desc">High to low</option>
-        </select></label
-      >
+        </select>
+      </label>
     </div>
   </div>
   <div class="skeleton-grid" *ngIf="loading">

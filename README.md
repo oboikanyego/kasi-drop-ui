@@ -89,3 +89,7 @@ Admins can open **Admin → Inventory → Edit product** to change a listing's n
 ## Manage products: search and advanced filters
 
 On Admin → Inventory, search by product name, ID/SKU, description or tag. Narrow results by visibility, category, stock level (out of stock 0, low stock 1–5, available 6+), and featured flag. Sort by newest, name, price or stock. All filters run server-side across the full inventory before pagination, with accurate matching counts. Use **Clear all filters** to restore the full list. Controls adapt to mobile screens.
+
+## Compact budget control on Shop
+
+The shop filter toolbar now groups **Category**, **Budget** and **Sort** in compact controls. **Budget is collapsed by default**. Selecting it reveals the existing minimum/maximum Rand sliders and amount inputs in an anchored **desktop popover**, or a full-width **mobile bottom sheet**. Customers can **Apply range** to filter products, **Reset** the draft, or dismiss with backdrop, close button or Escape without altering their applied range. The selected price interval appears directly on the Budget button. Keyboard focus is placed in the panel and restored to its trigger on close.
