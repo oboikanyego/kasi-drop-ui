@@ -101,7 +101,9 @@ export class AdminPage implements OnInit, OnDestroy {
   inventoryLoading = false;
   private inventoryRequest = 0;
   inventorySaving = new Set<string>();
-  get visibleInventory() { return this.products; }
+  get visibleInventory() {
+    return this.products;
+  }
   searchInventory() {
     this.appliedInventorySearch = this.inventorySearch.trim();
     this.loadInventory(1);
@@ -119,29 +121,31 @@ export class AdminPage implements OnInit, OnDestroy {
   loadInventory(page = this.inventoryPage) {
     const requestId = ++this.inventoryRequest;
     this.inventoryLoading = true;
-    this.api.adminProducts({
-      page,
-      q: this.appliedInventorySearch,
-      visibility: this.inventoryFilter,
-      category: this.inventoryCategory,
-      stock: this.inventoryStock,
-      featured: this.inventoryFeatured,
-      sort: this.inventorySort,
-    }).subscribe({
-      next: (result) => {
-        if (requestId !== this.inventoryRequest) return;
-        this.products = result.products;
-        this.inventoryPage = result.page;
-        this.inventoryPageSize = result.pageSize;
-        this.inventoryTotal = result.total;
-        this.inventoryLoading = false;
-      },
-      error: () => {
-        if (requestId !== this.inventoryRequest) return;
-        this.inventoryLoading = false;
-        this.error = 'Could not load inventory. Please try again.';
-      },
-    });
+    this.api
+      .adminProducts({
+        page,
+        q: this.appliedInventorySearch,
+        visibility: this.inventoryFilter,
+        category: this.inventoryCategory,
+        stock: this.inventoryStock,
+        featured: this.inventoryFeatured,
+        sort: this.inventorySort,
+      })
+      .subscribe({
+        next: (result) => {
+          if (requestId !== this.inventoryRequest) return;
+          this.products = result.products;
+          this.inventoryPage = result.page;
+          this.inventoryPageSize = result.pageSize;
+          this.inventoryTotal = result.total;
+          this.inventoryLoading = false;
+        },
+        error: () => {
+          if (requestId !== this.inventoryRequest) return;
+          this.inventoryLoading = false;
+          this.error = 'Could not load inventory. Please try again.';
+        },
+      });
   }
   setProductVisibility(product: Product) {
     if (this.inventorySaving.has(product.id)) return;

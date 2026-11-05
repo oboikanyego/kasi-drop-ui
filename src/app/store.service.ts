@@ -521,15 +521,17 @@ export class ApiService {
       recentOrders: Order[];
     }>(this.base + '/admin/summary');
   }
-  adminProducts(filters: {
-    page?: number;
-    q?: string;
-    visibility?: string;
-    category?: string;
-    stock?: string;
-    featured?: string;
-    sort?: string;
-  } = {}) {
+  adminProducts(
+    filters: {
+      page?: number;
+      q?: string;
+      visibility?: string;
+      category?: string;
+      stock?: string;
+      featured?: string;
+      sort?: string;
+    } = {},
+  ) {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(filters)) {
       if (value !== undefined && value !== '' && value !== 'all') params.set(key, String(value));
