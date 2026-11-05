@@ -85,3 +85,7 @@ The shop now has touch-friendly minimum/maximum budget sliders and editable Rand
 ## Editing existing products
 
 Admins can open **Admin → Inventory → Edit product** to change a listing's name, description, category, price, stock, tags, featured placement, visibility, and photo (including uploading a replacement). The existing product ID and order history stay unchanged. Edits use the authenticated `PATCH /api/admin/products/:id` endpoint, validate inputs, and show save/errors. **Cancel editing** abandons unsaved changes. The form is responsive on mobile.
+
+## Manage products: search and advanced filters
+
+On Admin → Inventory, search by product name, ID/SKU, description or tag. Narrow results by visibility, category, stock level (out of stock 0, low stock 1–5, available 6+), and featured flag. Sort by newest, name, price or stock. All filters run server-side across the full inventory before pagination, with accurate matching counts. Use **Clear all filters** to restore the full list. Controls adapt to mobile screens.

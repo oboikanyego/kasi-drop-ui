@@ -166,16 +166,54 @@
       </div>
       <button class="btn btn-orange" (click)="newProduct()">Add new +</button>
     </div>
-    <label class="inventory-filter"
-      >Show
-      <select [(ngModel)]="inventoryFilter" aria-label="Filter products by visibility">
-        <option value="all">All products</option>
-        <option value="active">Visible in store</option>
-        <option value="hidden">Hidden from store</option>
-      </select>
-    </label>
-    <p *ngIf="!visibleInventory.length">No products match this filter on the current page.</p>
-    <div class="table-wrap" *ngIf="visibleInventory.length">
+    <div class="inventory-toolbar">
+      <form class="inventory-search" (ngSubmit)="searchInventory()" role="search">
+        <label for="inventory-search">Search products</label>
+        <div class="inventory-search-row">
+          <input id="inventory-search" type="search" name="search" [(ngModel)]="inventorySearch"
+            placeholder="Search name, SKU, description or tags" maxlength="120" />
+          <button type="submit" class="btn btn-orange">Search</button>
+        </div>
+      </form>
+      <div class="inventory-filters">
+        <label for="inventory-visibility">Visibility
+          <select id="inventory-visibility" [(ngModel)]="inventoryFilter" (ngModelChange)="loadInventory(1)" aria-label="Filter products by visibility">
+            <option value="all">All products</option><option value="active">Visible in store</option><option value="hidden">Hidden from store</option>
+          </select>
+        </label>
+        <label for="inventory-category">Category
+          <select id="inventory-category" [(ngModel)]="inventoryCategory" (ngModelChange)="loadInventory(1)">
+            <option value="all">All categories</option><option value="Food & Drink">Food &amp; Drink</option>
+            <option value="Fashion">Fashion</option><option value="Home & Living">Home &amp; Living</option><option value="Crafts">Crafts</option>
+          </select>
+        </label>
+        <label for="inventory-stock">Stock
+          <select id="inventory-stock" [(ngModel)]="inventoryStock" (ngModelChange)="loadInventory(1)">
+            <option value="all">All stock levels</option><option value="out">Out of stock (0)</option>
+            <option value="low">Low stock (1–5)</option><option value="available">In stock (6+)</option>
+          </select>
+        </label>
+        <label for="inventory-featured">Featured
+          <select id="inventory-featured" [(ngModel)]="inventoryFeatured" (ngModelChange)="loadInventory(1)">
+            <option value="all">All items</option><option value="yes">Featured</option><option value="no">Not featured</option>
+          </select>
+        </label>
+        <label for="inventory-sort">Sort by
+          <select id="inventory-sort" [(ngModel)]="inventorySort" (ngModelChange)="loadInventory(1)">
+            <option value="newest">Newest first</option><option value="name-asc">Name A–Z</option>
+            <option value="name-desc">Name Z–A</option><option value="price-asc">Price: low to high</option>
+            <option value="price-desc">Price: high to low</option><option value="stock-asc">Stock: low to high</option>
+            <option value="stock-desc">Stock: high to low</option>
+          </select>
+        </label>
+      </div>
+      <div class="inventory-toolbar-foot">
+        <span role="status" aria-live="polite">{{inventoryLoading ? 'Loading products…' : (inventoryTotal + ' matching products')}}</span>
+        <button type="button" class="small-action" (click)="clearInventoryFilters()">Clear all filters</button>
+      </div>
+    </div>
+    <p *ngIf="!inventoryLoading && !visibleInventory.length">No products match your search or filters.</p>
+    <div class="table-wrap" *ngIf="!inventoryLoading && visibleInventory.length">
       <table>
         <thead>
           <tr>
