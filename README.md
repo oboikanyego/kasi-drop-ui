@@ -81,3 +81,7 @@ The **Admin → Insights & Feedback** tab shows 30-day anonymous event counts, c
 ## Shop budget range picker
 
 The shop now has touch-friendly minimum/maximum budget sliders and editable Rand amount fields (R0–R5,000+, with an open upper end at the slider maximum). Products update when an amount is selected. Filters also work in offline read-only catalogue preview. Clear filters resets the budget range.
+
+## Editing existing products
+
+Admins can open **Admin → Inventory → Edit product** to change a listing's name, description, category, price, stock, tags, featured placement, visibility, and photo (including uploading a replacement). The existing product ID and order history stay unchanged. Edits use the authenticated `PATCH /api/admin/products/:id` endpoint, validate inputs, and show save/errors. **Cancel editing** abandons unsaved changes. The form is responsive on mobile.
