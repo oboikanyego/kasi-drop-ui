@@ -7,13 +7,76 @@
   background: #fff;
   box-sizing: border-box;
 }
-.budget-range-title { display: block; font-size: .86rem; color: #3e4a40; font-weight: 750; margin-bottom: .25rem; }
-.budget-range-summary { color: #1e4932; font-size: 1.15rem; font-weight: 800; margin-bottom: .65rem; }
-.budget-sliders { display: grid; gap: .5rem; }
-.budget-sliders label { display: grid; gap: .3rem; color: #354639; font-size: .81rem; font-weight: 650; }
-.budget-sliders input[type="range"] { width: 100%; min-height: 30px; accent-color: #dc713b; cursor: pointer; touch-action: pan-y; }
-.budget-amounts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; margin-top: .45rem; }
-.budget-amounts label { font-size: .76rem; font-weight: 700; display: grid; gap: .35rem; color: #344639; min-width: 0; }
-.budget-amounts input { width: 100%; min-width: 0; box-sizing: border-box; min-height: 42px; border: 1px solid #c5d1c8; border-radius: 10px; padding: .55rem .6rem; font: inherit; background: #fff; color: #1a2721; }
-.budget-range-filter input:focus-visible { outline: 3px solid #a2ccaa; outline-offset: 2px; }
-@media(max-width: 680px) { .budget-range-filter { width: 100%; max-width: none; } .budget-sliders input[type="range"] { min-height: 44px; } .catalogue-selects { flex-wrap: wrap; } }
+.budget-range-title {
+  display: block;
+  font-size: 0.86rem;
+  color: #3e4a40;
+  font-weight: 750;
+  margin-bottom: 0.25rem;
+}
+.budget-range-summary {
+  color: #1e4932;
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-bottom: 0.65rem;
+}
+.budget-sliders {
+  display: grid;
+  gap: 0.5rem;
+}
+.budget-sliders label {
+  display: grid;
+  gap: 0.3rem;
+  color: #354639;
+  font-size: 0.81rem;
+  font-weight: 650;
+}
+.budget-sliders input[type='range'] {
+  width: 100%;
+  min-height: 30px;
+  accent-color: #dc713b;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+.budget-amounts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-top: 0.45rem;
+}
+.budget-amounts label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  display: grid;
+  gap: 0.35rem;
+  color: #344639;
+  min-width: 0;
+}
+.budget-amounts input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  min-height: 42px;
+  border: 1px solid #c5d1c8;
+  border-radius: 10px;
+  padding: 0.55rem 0.6rem;
+  font: inherit;
+  background: #fff;
+  color: #1a2721;
+}
+.budget-range-filter input:focus-visible {
+  outline: 3px solid #a2ccaa;
+  outline-offset: 2px;
+}
+@media (max-width: 680px) {
+  .budget-range-filter {
+    width: 100%;
+    max-width: none;
+  }
+  .budget-sliders input[type='range'] {
+    min-height: 44px;
+  }
+  .catalogue-selects {
+    flex-wrap: wrap;
+  }
+}

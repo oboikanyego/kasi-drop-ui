@@ -40,27 +40,68 @@
     <div class="catalogue-selects">
       <div class="budget-range-filter" role="group" aria-label="Budget range">
         <span class="budget-range-title">Budget range</span>
-        <div class="budget-range-summary">R{{minPrice | number:'1.0-0'}} – {{maxPrice === budgetCeiling ? 'R' + (maxPrice | number:'1.0-0') + '+' : 'R' + (maxPrice | number:'1.0-0')}}</div>
+        <div class="budget-range-summary">
+          R{{minPrice | number:'1.0-0'}} – {{maxPrice === budgetCeiling ? 'R' + (maxPrice |
+          number:'1.0-0') + '+' : 'R' + (maxPrice | number:'1.0-0')}}
+        </div>
         <div class="budget-sliders">
-          <label for="min-budget-range">Minimum price
-            <input id="min-budget-range" type="range" min="0" [max]="budgetCeiling" step="10"
-              [ngModel]="minPrice" (ngModelChange)="updateBudget('min', $event)" (change)="applyBudget()"
-              [attr.aria-valuetext]="'R' + minPrice" />
+          <label for="min-budget-range"
+            >Minimum price
+            <input
+              id="min-budget-range"
+              type="range"
+              min="0"
+              [max]="budgetCeiling"
+              step="10"
+              [ngModel]="minPrice"
+              (ngModelChange)="updateBudget('min', $event)"
+              (change)="applyBudget()"
+              [attr.aria-valuetext]="'R' + minPrice"
+            />
           </label>
-          <label for="max-budget-range">Maximum price
-            <input id="max-budget-range" type="range" min="0" [max]="budgetCeiling" step="10"
-              [ngModel]="maxPrice" (ngModelChange)="updateBudget('max', $event)" (change)="applyBudget()"
-              [attr.aria-valuetext]="maxPrice === budgetCeiling ? 'R' + maxPrice + ' or more' : 'R' + maxPrice" />
+          <label for="max-budget-range"
+            >Maximum price
+            <input
+              id="max-budget-range"
+              type="range"
+              min="0"
+              [max]="budgetCeiling"
+              step="10"
+              [ngModel]="maxPrice"
+              (ngModelChange)="updateBudget('max', $event)"
+              (change)="applyBudget()"
+              [attr.aria-valuetext]="maxPrice === budgetCeiling ? 'R' + maxPrice + ' or more' : 'R' + maxPrice"
+            />
           </label>
         </div>
         <div class="budget-amounts">
-          <label for="min-budget-amount">From (R)
-            <input id="min-budget-amount" type="number" inputmode="decimal" min="0" [max]="budgetCeiling" step="10"
-              [ngModel]="minPrice" (ngModelChange)="updateBudget('min', $event)" (change)="applyBudget()" />
+          <label for="min-budget-amount"
+            >From (R)
+            <input
+              id="min-budget-amount"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              [max]="budgetCeiling"
+              step="10"
+              [ngModel]="minPrice"
+              (ngModelChange)="updateBudget('min', $event)"
+              (change)="applyBudget()"
+            />
           </label>
-          <label for="max-budget-amount">To (R)
-            <input id="max-budget-amount" type="number" inputmode="decimal" min="0" [max]="budgetCeiling" step="10"
-              [ngModel]="maxPrice" (ngModelChange)="updateBudget('max', $event)" (change)="applyBudget()" />
+          <label for="max-budget-amount"
+            >To (R)
+            <input
+              id="max-budget-amount"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              [max]="budgetCeiling"
+              step="10"
+              [ngModel]="maxPrice"
+              (ngModelChange)="updateBudget('max', $event)"
+              (change)="applyBudget()"
+            />
           </label>
         </div>
       </div>
@@ -82,9 +123,7 @@
     <ion-icon name="search-outline"></ion-icon>
     <h3>No products found</h3>
     <p>Try a different search or category.</p>
-    <button type="button" class="lime-button" (click)="clearFilters()">
-      Clear filters
-    </button>
+    <button type="button" class="lime-button" (click)="clearFilters()">Clear filters</button>
   </div>
   <div class="notice-error" *ngIf="error">
     {{error}} <button (click)="load()">Try again</button>

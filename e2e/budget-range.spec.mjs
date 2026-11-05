@@ -11,9 +11,16 @@ test('shop range picker filters products between two amounts', async ({ page, st
   await page.locator('#max-budget-amount').press('Tab');
   await expect(page.getByText('African Sunrise Soy Candle')).toBeVisible();
   await expect(page.getByText('Cape Rooibos Tea Collection')).toHaveCount(0);
-  const filtered = (await stub.requests()).filter(r => r.path === '/api/products' && r.search.includes('minPrice=200') && r.search.includes('maxPrice=250'));
+  const filtered = (await stub.requests()).filter(
+    (r) =>
+      r.path === '/api/products' &&
+      r.search.includes('minPrice=200') &&
+      r.search.includes('maxPrice=250'),
+  );
   expect(filtered.length).toBeGreaterThan(0);
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1),
+  ).toBe(true);
 });
 test('range handles crossing bounds and resets filters', async ({ page, stub }) => {
   await stub.reset();

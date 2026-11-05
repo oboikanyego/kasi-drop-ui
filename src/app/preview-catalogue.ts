@@ -185,7 +185,7 @@ export function searchPreview(query = ''): Product[] {
     (p) =>
       p.active &&
       (category === 'All' || p.category === category) &&
-      (p.price >= minPrice) &&
+      p.price >= minPrice &&
       (!maxPrice || p.price <= maxPrice) &&
       (!terms.length ||
         terms.some((t) =>
