@@ -1,4 +1,12 @@
-import { ChangeDetectorRef, Component, ElementRef, HostListener, ViewChild, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  ViewChild,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { InsightsService } from './insights.service';
 import { CommonModule } from '@angular/common';
@@ -88,7 +96,9 @@ export class ShopPage implements OnInit {
     if (event.key !== 'Tab') return;
     const dialog = this.budgetDialog?.nativeElement;
     if (!dialog) return;
-    const controls = Array.from(dialog.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled])'));
+    const controls = Array.from(
+      dialog.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled])'),
+    );
     if (!controls.length) return;
     const first = controls[0];
     const last = controls[controls.length - 1];
