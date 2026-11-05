@@ -521,6 +521,9 @@ export class ApiService {
       recentOrders: Order[];
     }>(this.base + '/admin/summary');
   }
+  adminProducts(page = 1) {
+    return this.http.get<{ products: Product[]; total: number; page: number; pageSize: number }>(this.base + '/admin/products?page=' + encodeURIComponent(String(page)));
+  }
   adminOrders() {
     return this.http.get<{ orders: Order[] }>(this.base + '/admin/orders');
   }
