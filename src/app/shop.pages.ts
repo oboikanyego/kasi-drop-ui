@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { InsightsService } from './insights.service';
 import { CommonModule } from '@angular/common';
@@ -68,6 +68,24 @@ export class ShopPage implements OnInit {
   readonly budgetCeiling = 5000;
   minPrice = 0;
   maxPrice = this.budgetCeiling;
+  draftMinPrice = 0;
+  draftMaxPrice = this.budgetCeiling;
+  budgetOpen = false;
+  get budgetApplied() {
+    return this.minPrice > 0 || this.maxPrice < this.budgetCeiling;
+  }
+  @HostListener('document:keydown.escape')
+  dismissBudgetOnEscape() {
+    this.closeBudget();
+  }
+  openBudget() {
+    this.draftMinPrice = this.minPrice;
+    this.draftMaxPrice = this.maxPrice;
+    this.budgetOpen = true;
+  }
+  closeBudget() {
+    this.budgetOpen = false;
+  }
   loading = true;
   error = '';
   ngOnInit() {
@@ -77,6 +95,7 @@ export class ShopPage implements OnInit {
       this.minPrice = this.parseBudget(params.get('minPrice'), 0);
       this.maxPrice = this.parseBudget(params.get('maxPrice'), this.budgetCeiling);
       if (this.minPrice > this.maxPrice) this.maxPrice = this.minPrice;
+      this.closeBudget();
       this.load();
     });
   }
@@ -88,17 +107,25 @@ export class ShopPage implements OnInit {
   updateBudget(side: 'min' | 'max', value: number) {
     const amount = Math.max(0, Math.min(this.budgetCeiling, Number(value) || 0));
     if (side === 'min') {
-      this.minPrice = amount;
-      if (this.maxPrice < amount) this.maxPrice = amount;
+      this.draftMinPrice = amount;
+      if (this.draftMaxPrice < amount) this.draftMaxPrice = amount;
     } else {
-      this.maxPrice = amount;
-      if (this.minPrice > amount) this.minPrice = amount;
+      this.draftMaxPrice = amount;
+      if (this.draftMinPrice > amount) this.draftMinPrice = amount;
     }
   }
   applyBudget() {
+    this.minPrice = this.draftMinPrice;
+    this.maxPrice = this.draftMaxPrice;
+    this.closeBudget();
     this.load();
   }
+  resetBudget() {
+    this.draftMinPrice = 0;
+    this.draftMaxPrice = this.budgetCeiling;
+  }
   clearFilters() {
+    this.closeBudget();
     this.q = '';
     this.category = 'All';
     this.minPrice = 0;
