@@ -64,15 +64,46 @@ export class ShopPage implements OnInit {
   category = 'All';
   q = '';
   sort = 'featured';
-  maxPrice = 0;
+  readonly budgetCeiling = 5000;
+  minPrice = 0;
+  maxPrice = this.budgetCeiling;
   loading = true;
   error = '';
   ngOnInit() {
     this.route.queryParamMap.subscribe((params) => {
       this.category = params.get('category') || 'All';
       this.q = params.get('q') || '';
+      this.minPrice = this.parseBudget(params.get('minPrice'), 0);
+      this.maxPrice = this.parseBudget(params.get('maxPrice'), this.budgetCeiling);
+      if (this.minPrice > this.maxPrice) this.maxPrice = this.minPrice;
       this.load();
     });
+  }
+  parseBudget(raw: string | null, fallback: number): number {
+    if (raw === null || raw.trim() === '') return fallback;
+    const amount = Number(raw);
+    return Number.isFinite(amount) ? Math.max(0, Math.min(this.budgetCeiling, amount)) : fallback;
+  }
+  updateBudget(side: 'min' | 'max', value: number) {
+    const amount = Math.max(0, Math.min(this.budgetCeiling, Number(value) || 0));
+    if (side === 'min') {
+      this.minPrice = amount;
+      if (this.maxPrice < amount) this.maxPrice = amount;
+    } else {
+      this.maxPrice = amount;
+      if (this.minPrice > amount) this.minPrice = amount;
+    }
+  }
+  applyBudget() {
+    this.load();
+  }
+  clearFilters() {
+    this.q = '';
+    this.category = 'All';
+    this.minPrice = 0;
+    this.maxPrice = this.budgetCeiling;
+    this.sort = 'featured';
+    this.load();
   }
   load() {
     if (this.q.trim()) this.insights.track('product_search', 'shop');
@@ -82,7 +113,8 @@ export class ShopPage implements OnInit {
     if (this.q.trim()) params.set('q', this.q.trim());
     if (this.category !== 'All') params.set('category', this.category);
     if (this.sort !== 'featured') params.set('sort', this.sort);
-    if (this.maxPrice > 0) params.set('maxPrice', String(this.maxPrice));
+    if (this.minPrice > 0) params.set('minPrice', String(this.minPrice));
+    if (this.maxPrice < this.budgetCeiling) params.set('maxPrice', String(this.maxPrice));
     this.api.getProducts('?' + params.toString()).subscribe({
       next: (r) => {
         this.products = r.products;
