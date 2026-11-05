@@ -157,34 +157,54 @@
   </div>
   <div *ngIf="tab==='products'">
     <div class="admin-section-head">
-      <h2>Manage products</h2>
+      <div>
+        <h2>Manage products</h2>
+        <p>Hide discontinued products without deleting them or affecting existing orders. Restore them whenever they are available again.</p>
+      </div>
       <button class="btn btn-orange" (click)="tab='add'">Add new +</button>
     </div>
-    <div class="table-wrap">
+    <label class="inventory-filter">Show
+      <select [(ngModel)]="inventoryFilter" aria-label="Filter products by visibility">
+        <option value="all">All products</option>
+        <option value="active">Visible in store</option>
+        <option value="hidden">Hidden from store</option>
+      </select>
+    </label>
+    <p *ngIf="!visibleInventory.length">No products match this filter on the current page.</p>
+    <div class="table-wrap" *ngIf="visibleInventory.length">
       <table>
         <thead>
           <tr>
-            <th>Product</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>Stock</th>
-            <th>Action</th>
+            <th>Product</th><th>Category</th><th>Price</th><th>Stock</th>
+            <th>Store visibility</th><th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let p of products">
-            <td>
-              <div class="table-product"><img [src]="p.image" [alt]="p.name" />{{p.name}}</div>
-            </td>
+          <tr *ngFor="let p of visibleInventory" [class.inventory-hidden-row]="!p.active">
+            <td><div class="table-product"><img [src]="p.image" [alt]="p.name" />{{p.name}}</div></td>
             <td>{{p.category}}</td>
             <td>{{p.price|currency:'ZAR':'symbol-narrow':'1.0-0'}}</td>
-            <td><input class="stock-input" type="number" min="0" [(ngModel)]="p.stock" /></td>
+            <td><input class="stock-input" type="number" min="0" [(ngModel)]="p.stock" [attr.aria-label]="'Stock for ' + p.name" /></td>
+            <td><span class="inventory-visibility" [class.is-hidden]="!p.active">{{p.active ? 'Visible' : 'Hidden'}}</span></td>
             <td>
-              <button class="small-action" (click)="stockChange(p,p.stock)">Save stock</button>
+              <div class="inventory-actions">
+                <button class="small-action" (click)="stockChange(p,p.stock)">Save stock</button>
+                <button type="button" class="small-action" [class.inventory-restore]="!p.active"
+                  [disabled]="inventorySaving.has(p.id)"
+                  [attr.aria-label]="(p.active ? 'Hide ' : 'Show ') + p.name + (p.active ? ' from store' : ' in store')"
+                  (click)="setProductVisibility(p)">
+                  {{inventorySaving.has(p.id) ? 'Saving…' : (p.active ? 'Hide from store' : 'Show in store')}}
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
       </table>
+    </div>
+    <div class="inventory-pagination" *ngIf="inventoryTotal > inventoryPageSize">
+      <button type="button" class="small-action" [disabled]="inventoryPage <= 1" (click)="loadInventory(inventoryPage - 1)">Previous</button>
+      <span>Page {{inventoryPage}} of {{inventoryPageCount}} · {{inventoryTotal}} products</span>
+      <button type="button" class="small-action" [disabled]="inventoryPage * inventoryPageSize >= inventoryTotal" (click)="loadInventory(inventoryPage + 1)">Next</button>
     </div>
   </div>
   <div *ngIf="tab==='orders'">

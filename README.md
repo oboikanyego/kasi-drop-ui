@@ -73,3 +73,7 @@ The **Admin → Insights & Feedback** tab shows 30-day anonymous event counts, c
 - Admin overview shows deployment readiness diagnostics. Live payments remain **disabled**; only the sandbox gateway is implemented.
 - The homepage features a trending-products section driven by 30-day anonymous product views and add-to-cart aggregates. There is no user identity tracking or personalised profile.
 - The API has an optional Cloudflare R2 storage backend configured entirely through Render environment values. See API README for the staged migration procedure; do not add secrets to Netlify.
+
+## Hide discontinued products
+
+**Admin → Inventory** now includes a visibility status and **Hide from store / Show in store** controls. Hidden products remain in the admin catalogue and can be restored without losing their information. Filter visible/hidden items and navigate pages. Shoppers no longer see hidden products in searches, details, recommendations or AI suggestions, and cannot check out with a hidden item from an old cart.

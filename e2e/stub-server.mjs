@@ -75,6 +75,7 @@ function reset(options = {}) {
     // Whether the server has an AI key (shown by /api/meta), and an error for listing drafts to return.
     aiEnabled: options.aiEnabled ?? true,
     aiListingError: options.aiListingError ?? null,
+    products: products.map(product => ({ ...product })),
     images: new Map(),
     avatar: null,
     requests: [],
@@ -201,9 +202,10 @@ async function api(req, res, path, search = '') {
       checkoutEnabled: true,
       shipping: { freeFrom: 750, fee: 79 },
     });
-  if (route === 'GET /api/products') return send(res, 200, { products, total: products.length });
+  if (route === 'GET /api/products') return send(res, 200, { products: state.products.filter(p => p.active), total: state.products.filter(p => p.active).length });
+  if (route === 'GET /api/admin/products') return user?.role === 'admin' ? send(res, 200, { products: state.products, total: state.products.length, page: 1, pageSize: 100 }) : send(res, 403, { error: 'Admin access required' });
   if (route.startsWith('GET /api/products/')) {
-    const p = products.find((x) => x.id === path.split('/').pop());
+    const p = state.products.find((x) => x.id === path.split('/').pop() && x.active);
     return p ? send(res, 200, { product: p, similar: [] }) : send(res, 404, { error: 'Not found' });
   }
   if (route === 'GET /api/favorites') return send(res, 200, { productIds: [] });
@@ -224,6 +226,7 @@ async function api(req, res, path, search = '') {
       },
     });
   if (route === 'POST /api/orders/checkout') {
+    if (body.items.some(item => !state.products.some(product => product.id === item.productId && product.active))) return send(res, 400, { error: 'Product no longer available' });
     if (body.paymentMethod === 'demo') {
       const order = newOrder(body, 'demo_paid');
       return send(res, 201, {
@@ -297,10 +300,13 @@ async function api(req, res, path, search = '') {
   }
   if (route === 'POST /api/admin/products')
     return send(res, 201, { product: { ...body, id: 'new-product' } });
-  if (req.method === 'PATCH' && path.startsWith('/api/admin/products/'))
-    return send(res, 200, {
-      product: { ...products.find((p) => p.id === path.split('/').pop()), ...body },
-    });
+  if (req.method === 'PATCH' && path.startsWith('/api/admin/products/')) {
+    if (user?.role !== 'admin') return send(res, 403, { error: 'Admin access required' });
+    const product = state.products.find((p) => p.id === path.split('/').pop());
+    if (!product) return send(res, 404, { error: 'Product not found' });
+    Object.assign(product, body);
+    return send(res, 200, { product });
+  }
   return send(res, 404, { error: 'Not found' });
 }
 http
