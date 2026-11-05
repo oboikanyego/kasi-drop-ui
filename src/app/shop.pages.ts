@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { InsightsService } from './insights.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,6 +14,8 @@ import { ProductGridComponent } from './product-grid.component';
   templateUrl: './home.page.html',
 })
 export class HomePage implements OnInit {
+  private readonly http = inject(HttpClient);
+  trending: Product[] = [];
   readonly api = inject(ApiService);
   readonly store = inject(StoreService);
   readonly router = inject(Router);
@@ -24,6 +27,7 @@ export class HomePage implements OnInit {
     this.reload();
   }
   reload() {
+    this.http.get<{products:Product[]}>('/api/recommendations').subscribe({ next: r => this.trending = r.products, error: () => this.trending = [] });
     this.loading = true;
     this.error = '';
     this.api.getProducts().subscribe({
@@ -100,6 +104,7 @@ export class ShopPage implements OnInit {
   templateUrl: './product.page.html',
 })
 export class ProductPage implements OnInit {
+  readonly insights = inject(InsightsService);
   readonly api = inject(ApiService);
   readonly store = inject(StoreService);
   readonly route = inject(ActivatedRoute);
@@ -114,6 +119,7 @@ export class ProductPage implements OnInit {
         this.api.getProduct(id).subscribe({
           next: (r) => {
             this.product = r.product;
+            this.insights.track('product_view', 'product', r.product.id);
             this.similar = r.similar;
             this.quantity = 1;
             this.error = '';

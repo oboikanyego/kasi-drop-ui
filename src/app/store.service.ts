@@ -164,7 +164,7 @@ export class StoreService {
     });
     this.selectedIds.update((ids) => (ids.includes(product.id) ? ids : [...ids, product.id]));
     this.persist();
-    this.insights.track('add_to_cart', 'cart');
+    this.insights.track('add_to_cart', 'cart', product.id);
     this.notify(product.name + ' added to your bag');
   }
   update(id: string, quantity: number) {
