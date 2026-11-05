@@ -87,6 +87,7 @@ export class AdminPage implements OnInit, OnDestroy {
   inventoryPage = 1;
   inventoryTotal = 0;
   inventoryPageSize = 100;
+  get inventoryPageCount() { return Math.ceil(this.inventoryTotal / this.inventoryPageSize); }
   inventoryFilter: 'all' | 'active' | 'hidden' = 'all';
   inventorySaving = new Set<string>();
   get visibleInventory() {
