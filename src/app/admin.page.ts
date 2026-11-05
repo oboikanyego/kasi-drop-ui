@@ -33,9 +33,17 @@ export class AdminPage implements OnInit, OnDestroy {
     periodDays: number;
     counts: Record<string, number>;
     checkoutConversion: number;
+    confirmedPayments: number;
+    paymentConversion: number;
     note: string;
   };
-  feedback: Array<{ category: string; rating?: number; message: string; createdAt: string }> = [];
+  feedback: Array<{ id: string; category: string; rating?: number; message: string; status: 'new' | 'in_review' | 'resolved' | 'closed'; createdAt: string }> = [];
+  feedbackFilter = 'all';
+  paymentReadiness?: { deployable: boolean; acceptsRealPayments: boolean; sandboxReady: boolean; gatewayMode: string; databaseMode: string; imageStorage: string; issues: string[] };
+  get filteredFeedback() { return this.feedback.filter(item => this.feedbackFilter === 'all' || item.status === this.feedbackFilter); }
+  updateFeedback(item: (typeof this.feedback)[number], status: (typeof this.feedback)[number]['status']) {
+    this.http.patch<{id:string;status:typeof status}>('/api/admin/feedback/' + item.id, { status }).subscribe({ next: () => item.status = status, error: () => this.error = 'Could not update feedback status.' });
+  }
   store = inject(StoreService);
   tab: 'overview' | 'products' | 'orders' | 'add' | 'insights' = 'overview';
   summary?: {
@@ -78,11 +86,14 @@ export class AdminPage implements OnInit, OnDestroy {
     }
   }
   refresh() {
+    this.http.get<{ deployable: boolean; acceptsRealPayments: boolean; sandboxReady: boolean; gatewayMode: string; databaseMode: string; imageStorage: string; issues: string[] }>('/api/admin/deployment-readiness').subscribe({ next: r => this.paymentReadiness = r, error: () => {} });
     this.http
       .get<{
         periodDays: number;
         counts: Record<string, number>;
         checkoutConversion: number;
+        confirmedPayments: number;
+        paymentConversion: number;
         note: string;
       }>('/api/admin/analytics')
       .subscribe({
@@ -91,7 +102,7 @@ export class AdminPage implements OnInit, OnDestroy {
       });
     this.http
       .get<{
-        feedback: Array<{ category: string; rating?: number; message: string; createdAt: string }>;
+        feedback: Array<{ id: string; category: string; rating?: number; message: string; status: 'new' | 'in_review' | 'resolved' | 'closed'; createdAt: string }>;
       }>('/api/admin/feedback')
       .subscribe({
         next: (r) => (this.feedback = r.feedback),
