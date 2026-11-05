@@ -211,15 +211,36 @@ async function api(req, res, path, search = '') {
     );
     return send(res, 200, { products: filtered, total: filtered.length });
   }
-  if (route === 'GET /api/admin/products')
-    return user?.role === 'admin'
-      ? send(res, 200, {
-          products: state.products,
-          total: state.products.length,
-          page: 1,
-          pageSize: 100,
-        })
-      : send(res, 403, { error: 'Admin access required' });
+  if (route === 'GET /api/admin/products') {
+    if (user?.role !== 'admin') return send(res, 403, { error: 'Admin access required' });
+    const params = new URLSearchParams(search);
+    const q = (params.get('q') || '').toLowerCase();
+    const visibility = params.get('visibility') || 'all';
+    const category = params.get('category') || 'all';
+    const stock = params.get('stock') || 'all';
+    const featured = params.get('featured') || 'all';
+    const sort = params.get('sort') || 'newest';
+    const page = Number(params.get('page') || 1);
+    const filtered = state.products.filter(p =>
+      (visibility === 'all' || p.active === (visibility === 'active')) &&
+      (category === 'all' || p.category === category) &&
+      (stock === 'all' || (stock === 'out' && p.stock === 0) ||
+        (stock === 'low' && p.stock > 0 && p.stock <= 5) ||
+        (stock === 'available' && p.stock > 5)) &&
+      (featured === 'all' || p.featured === (featured === 'yes')) &&
+      (!q || [p.name,p.id,p.description,...p.tags].some(x => x.toLowerCase().includes(q)))
+    );
+    const sorts = {
+      'name-asc': (a,b) => a.name.localeCompare(b.name),
+      'name-desc': (a,b) => b.name.localeCompare(a.name),
+      'price-asc': (a,b) => a.price - b.price,
+      'price-desc': (a,b) => b.price - a.price,
+      'stock-asc': (a,b) => a.stock - b.stock,
+      'stock-desc': (a,b) => b.stock - a.stock,
+    };
+    if (sorts[sort]) filtered.sort(sorts[sort]);
+    return send(res, 200, { products: filtered.slice((page-1)*100,page*100), total: filtered.length, page, pageSize: 100 });
+  }
   if (route.startsWith('GET /api/products/')) {
     const p = state.products.find((x) => x.id === path.split('/').pop() && x.active);
     return p ? send(res, 200, { product: p, similar: [] }) : send(res, 404, { error: 'Not found' });
