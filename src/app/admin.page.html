@@ -10,7 +10,7 @@
     <button [class.active]="tab==='overview'" (click)="tab='overview'">Overview</button
     ><button [class.active]="tab==='products'" (click)="tab='products'">Inventory</button
     ><button [class.active]="tab==='orders'" (click)="tab='orders'">Orders</button
-    ><button [class.active]="tab==='add'" (click)="tab='add'">+ Add product</button
+    ><button [class.active]="tab==='add'" (click)="tab='add'"(click)="newProduct()">+ Add product</button
     ><button [class.active]="tab==='insights'" (click)="tab='insights';refresh()">
       Insights &amp; Feedback
     </button>
@@ -164,7 +164,7 @@
           them whenever they are available again.
         </p>
       </div>
-      <button class="btn btn-orange" (click)="tab='add'">Add new +</button>
+      <button class="btn btn-orange" (click)="newProduct()">Add new +</button>
     </div>
     <label class="inventory-filter"
       >Show
@@ -211,6 +211,7 @@
             <td>
               <div class="inventory-actions">
                 <button class="small-action" (click)="stockChange(p,p.stock)">Save stock</button>
+                <button type="button" class="small-action inventory-edit" [attr.aria-label]="'Edit ' + p.name" (click)="editProduct(p)">Edit product</button>
                 <button
                   type="button"
                   class="small-action"
@@ -300,9 +301,9 @@
   </div>
   <div class="admin-editor" *ngIf="tab==='add'">
     <div>
-      <h2>Add a local product</h2>
-      <p>Every new listing starts with a great story.</p>
-      <form (ngSubmit)="add()">
+      <h2>{{editingProduct ? 'Edit product listing' : 'Add a local product'}}</h2>
+      <p>{{editingProduct ? 'Update details without deleting the product or changing previous orders.' : 'Every new listing starts with a great story.'}}</p>
+      <form #productForm="ngForm" (ngSubmit)="add()">
         <label
           >Product name<input name="name" [(ngModel)]="form.name" required minlength="3" /></label
         ><label
@@ -323,7 +324,7 @@
               <option>Crafts</option>
             </select></label
           ><label
-            >Price (R)<input name="price" type="number" min="1" [(ngModel)]="form.price" required
+            >Price (R)<input name="price" type="number" min="0.01" max="100000" step="0.01" [(ngModel)]="form.price" required
           /></label>
         </div>
         <div class="form-grid">
@@ -332,6 +333,7 @@
               name="stock"
               type="number"
               min="0"
+              step="1"
               [(ngModel)]="form.stock"
               required /></label
           ><label>Tags (comma separated)<input name="tags" [(ngModel)]="form.tags" /></label>
@@ -340,7 +342,7 @@
           <span class="photo-field-label">Product photo</span>
           <div class="photo-row">
             <div class="photo-preview">
-              <img *ngIf="imagePreview" [src]="imagePreview" alt="Preview of the product photo" />
+              <img *ngIf="imagePreview || form.image" [src]="imagePreview || form.image" alt="Current product photo" />
               <span *ngIf="!imagePreview">{{uploadingImage?'Uploading…':'No photo yet'}}</span>
             </div>
             <div class="photo-actions">
@@ -370,14 +372,16 @@
         </div>
         <label class="checkbox-field"
           ><input name="featured" type="checkbox" [(ngModel)]="form.featured" /> Feature on
-          homepage</label
+          homepage</label>
+        <label class="checkbox-field" *ngIf="editingProduct"><input name="active" type="checkbox" [(ngModel)]="form.active" /> Visible in store</label>
         ><button
           class="btn btn-orange"
           type="submit"
-          [disabled]="busy||uploadingImage||!form.image"
+          [disabled]="busy||uploadingImage||!form.image||productForm.invalid"
         >
-          {{busy?'Saving…':'Publish product ↗'}}
+          {{busy?'Saving…':(editingProduct?'Save changes':'Publish product ↗')}}
         </button>
+        <button *ngIf="editingProduct" type="button" class="btn btn-outline inventory-cancel" (click)="cancelEdit()" [disabled]="busy||uploadingImage">Cancel editing</button>
         <small class="photo-hint" *ngIf="!form.image&&!uploadingImage"
           >Add a photo to publish your product.</small
         >
