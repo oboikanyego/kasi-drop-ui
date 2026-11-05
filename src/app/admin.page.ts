@@ -25,6 +25,7 @@ const productPhoto = { maxSide: 1200, maxBytes: 1024 * 1024 };
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, IonicModule],
   templateUrl: './admin.page.html',
+  styleUrls: ['./admin-visibility.scss'],
 })
 export class AdminPage implements OnInit, OnDestroy {
   api = inject(ApiService);
